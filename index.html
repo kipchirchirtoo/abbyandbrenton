@@ -44,8 +44,8 @@ h2{font-size:clamp(2rem,6vw,3rem);margin-bottom:24px}
 /* ---------- Hero ---------- */
 .hero{min-height:100vh;max-width:none;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;color:#fff;
   background:#2c2f28;overflow:hidden}
-.hero>*:not(.slides):not(.shade){position:relative;z-index:3}
-.hero .scroll{position:absolute}
+.hero>.eyebrow,.hero>h1,.hero>p{position:relative;z-index:3}
+.hero>.scroll{position:absolute;bottom:26px;left:0;right:0;z-index:3;text-align:center}
 .slides,.shade{position:absolute;inset:0}
 .shade{z-index:2;background:linear-gradient(rgba(30,30,28,.5),rgba(30,30,28,.55))}
 .slide{position:absolute;inset:0;background-size:cover;background-position:center 25%;opacity:0;transform:scale(1.02);transition:opacity 1.6s ease}
@@ -237,6 +237,7 @@ footer .script{color:#f1dfae;font-size:3rem}
     <textarea id="msg" name="msg" rows="3"></textarea>
     <button class="btn solid" type="submit" style="width:100%">Send RSVP</button>
   </form>
+  <div id="typeform-embed" style="display:none;max-width:700px;margin:36px auto 0;height:620px"></div>
   <div class="thanks" id="thanks"><p class="script">Thank you!</p><p class="lead">Your reply has been received. We can't wait to celebrate with you.</p></div>
 </section>
 
@@ -253,6 +254,7 @@ footer .script{color:#f1dfae;font-size:3rem}
 /* ===== EDIT THESE ===== */
 const WEDDING_DATE = new Date('2027-01-15T14:00:00+03:00');
 const WHATSAPP_NUMBER = '';           // e.g. '254712345678' — RSVPs open a WhatsApp message to this number
+const TYPEFORM_ID = '';               // paste your Typeform form ID here (e.g. 'aB3dEf9X'); leave '' to use the built-in form
 const RSVP_EMAIL = 'kiprutobrenton@gmail.com'; // fallback if no WhatsApp number
 /* ====================== */
 
@@ -313,6 +315,20 @@ document.getElementById('cal').addEventListener('click',e=>{
   c.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40){go(n+(dx<0?1:-1));restart()}x0=null});
   dw.children[0].classList.add('on');restart();
 })();
+
+// Typeform RSVP (replaces the built-in form when TYPEFORM_ID is set)
+if(TYPEFORM_ID){
+  const box=document.getElementById('typeform-embed');
+  box.style.display='block';
+  document.getElementById('form').style.display='none';
+  const w=document.createElement('div');
+  w.setAttribute('data-tf-live',TYPEFORM_ID);
+  w.style.cssText='width:100%;height:100%';
+  box.appendChild(w);
+  const s=document.createElement('script');
+  s.src='https://embed.typeform.com/next/embed.js';
+  document.body.appendChild(s);
+}
 
 // Scroll reveal
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.15});
