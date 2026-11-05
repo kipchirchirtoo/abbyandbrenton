@@ -92,6 +92,12 @@ h2{font-size:clamp(2rem,6vw,3rem);margin-bottom:24px}
 .carousel img.on{opacity:1}
 .carousel button{position:absolute;top:50%;translate:0 -50%;z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,253,248,.85);color:var(--ink);font-size:1.3rem;cursor:pointer}
 .carousel .prev{left:10px}.carousel .next{right:10px}
+.stories{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:48px 0 8px;text-align:left}
+.story{background:var(--paper);border:1px solid #eadfc9;border-radius:4px;padding:32px 28px}
+.story h3{font-size:1.9rem;margin-bottom:14px}
+.story p{color:var(--muted);margin-bottom:14px;font-size:.98rem}
+.story p.eyebrow{color:var(--sage-d);margin-bottom:6px}
+.story p.quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.25rem;color:var(--ink);border-top:1px solid #eadfc9;padding-top:16px;margin:18px 0 0}
 .cdots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:2}
 .cdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6);cursor:pointer}
 .cdots i.on{background:#fff;width:20px;border-radius:4px}
@@ -175,7 +181,7 @@ footer .script{color:#f1dfae;font-size:3rem}
   <p class="eyebrow">Our story</p>
   <h2>How it began</h2>
   <div class="divider"></div>
-  <p class="lead">We met over a shared cup of coffee and a very long conversation. Years, trips and countless laughs later, he asked a question and she said yes. Now we'd love for you to be there as we begin our next chapter together.</p>
+  <p class="lead">Some love stories are written in the stars. Ours began with a simple meeting, a shared cup of coffee, and a conversation neither of us knew would change our lives forever.</p>
   <div class="carousel" id="carousel">
     <img class="on" src="photos/g1.jpg" alt="Abigael with a fan">
     <img src="photos/g2.jpg" loading="lazy" alt="Abigael and Brenton embracing">
@@ -189,6 +195,31 @@ footer .script{color:#f1dfae;font-size:3rem}
     <button class="next" aria-label="Next photo">›</button>
     <div class="cdots"></div>
   </div>
+
+  <div class="stories">
+    <article class="story">
+      <p class="eyebrow">Brenton's story</p>
+      <h3>The way I love her</h3>
+      <p>Loving you was the easiest thing I have ever done. Somewhere between our first conversations, the endless laughter, and the little moments we shared, I found myself falling for you in ways I never imagined possible.</p>
+      <p>You became my favourite thought in the middle of a busy day, my peace in moments of uncertainty, and the person I wanted beside me through every season of life. I fell in love with your smile, your heart, your beautiful imperfections, and the way you make even the simplest moments feel extraordinary.</p>
+      <p>With you, love never felt like something I had to figure out. It felt natural. It felt like home. Every journey, every adventure, every late-night conversation only made me more certain that there was no one else I would rather do life with.</p>
+      <p>And when I finally asked you to be mine forever, I wasn't just asking you to marry me. I was choosing my best friend, my greatest blessing, and the woman I want to wake up beside for the rest of my life.</p>
+      <p class="quote">If I had to live our story a thousand times, I would still find my way to you. Every single time.</p>
+    </article>
+    <article class="story">
+      <p class="eyebrow">Abigael's story</p>
+      <h3>The way I love him</h3>
+      <p>I never knew that one person could make the world feel so different until Brenton came into my life. What began as a simple meeting slowly became something I couldn't imagine living without.</p>
+      <p>He became the person I wanted to tell everything to, the one whose presence could turn an ordinary day into my favourite memory. It wasn't just the grand gestures or the beautiful moments; it was the little things. The laughter, the conversations, the reassurance, and the countless ways he made me feel loved without even trying.</p>
+      <p>Somewhere along the way, I realised that I wasn't just falling in love with him. I was falling in love with the life we were building together. With his dreams, his heart, his strength, and even the little things that make him who he is.</p>
+      <p>Saying yes was one of the easiest decisions my heart has ever made. Because in him, I found more than a partner. I found my best friend, my safe place, and the person I want to share every tomorrow with.</p>
+      <p class="quote">Brenton, if love is a journey, then you are my favourite destination. I would choose you in every lifetime, in every version of this world, and in every story yet to be written.</p>
+    </article>
+  </div>
+
+  <div class="divider"></div>
+  <p class="script" style="font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.2">And so, our forever begins…</p>
+  <p class="lead" style="margin-top:12px">Two hearts, two stories, one beautiful promise. The best chapters are still ahead of us, and we cannot wait to write them together.</p>
 </section>
 
 <!-- DETAILS -->
@@ -248,7 +279,7 @@ footer .script{color:#f1dfae;font-size:3rem}
 
 <button id="music" aria-label="Toggle music">♪</button>
 <!-- Put your song at ./music.mp3 -->
-<audio id="audio" src="music.mp3" loop preload="none"></audio>
+<audio id="audio" src="music.mp3" loop preload="auto"></audio>
 
 <script>
 /* ===== EDIT THESE ===== */
@@ -265,12 +296,23 @@ function openInvite(){
   if(intro.classList.contains('open')) return;
   intro.classList.add('open');
   setTimeout(()=>document.body.classList.remove('locked'),900);
-  audio.play().then(()=>{music.classList.add('on')}).catch(()=>{});
-  fetch('music.mp3',{method:'HEAD'}).then(r=>{if(r.ok)music.classList.add('on')}).catch(()=>{});
+  startMusic();
 }
+function startMusic(){
+  audio.volume=0.8;
+  const p=audio.play();
+  if(p&&p.catch)p.catch(()=>{
+    // Browser blocked it: start on the very next tap, scroll or key press
+    const retry=()=>{audio.play().then(()=>['pointerdown','keydown','touchstart','scroll'].forEach(t=>removeEventListener(t,retry))).catch(()=>{})};
+    ['pointerdown','keydown','touchstart','scroll'].forEach(t=>addEventListener(t,retry,{passive:true}));
+  });
+}
+intro.addEventListener('click',openInvite);   // tapping anywhere on the envelope screen opens it and starts the song
 env.addEventListener('click',openInvite);
 env.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')openInvite()});
-music.addEventListener('click',()=>{audio.paused?audio.play():audio.pause();music.textContent=audio.paused?'♪':'❚❚'});
+music.addEventListener('click',()=>{audio.paused?audio.play():audio.pause()});
+audio.addEventListener('play',()=>{music.textContent='❚❚';music.classList.add('on')});
+audio.addEventListener('pause',()=>{music.textContent='♪'});
 
 // Countdown
 function tick(){
