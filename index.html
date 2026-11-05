@@ -120,6 +120,14 @@ h2{font-size:clamp(2rem,6vw,3rem);margin-bottom:24px}
 
 footer{padding:60px 24px;text-align:center;background:var(--sage-d);color:#f3f0e6}
 footer .script{color:#f1dfae;font-size:3rem}
+.credit{margin:36px auto 0;padding-top:28px;max-width:420px;border-top:1px solid rgba(241,223,174,.4);font-family:'Cormorant Garamond',serif}
+.credit .heart{display:inline-block;font-size:1.6rem;animation:beat 1.6s ease-in-out infinite}
+.credit .from{font-size:1.5rem;font-style:italic;margin-top:4px}
+.credit .from b{font-weight:600;color:#f1dfae;letter-spacing:.04em}
+.credit .to{font-size:1.25rem;font-style:italic;color:#e8e1cf}
+.credit .wish{font-family:'Jost',sans-serif;font-size:.8rem;letter-spacing:.12em;margin-top:12px;opacity:.85}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
 
 /* music button */
 #music{position:fixed;right:16px;bottom:16px;z-index:50;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:rgba(255,253,248,.92);cursor:pointer;font-size:1.1rem;display:none}
@@ -275,6 +283,12 @@ footer .script{color:#f1dfae;font-size:3rem}
 <footer>
   <p class="script">Abigael &amp; Brenton</p>
   <p style="letter-spacing:.3em;text-transform:uppercase;font-size:.75rem">#AbigaelAndBrenton2027</p>
+  <div class="credit">
+    <span class="heart" aria-hidden="true">❤️</span>
+    <p class="from">From <b>Hirall Solutions</b></p>
+    <p class="to">to Abigael &amp; Brenton</p>
+    <p class="wish">With all our love and best wishes for your forever 💕</p>
+  </div>
 </footer>
 
 <button id="music" aria-label="Toggle music">♪</button>
