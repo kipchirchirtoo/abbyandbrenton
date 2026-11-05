@@ -254,6 +254,7 @@ footer .script{color:#f1dfae;font-size:3rem}
 /* ===== EDIT THESE ===== */
 const WEDDING_DATE = new Date('2027-01-15T14:00:00+03:00');
 const WHATSAPP_NUMBER = '';           // e.g. '254712345678' — RSVPs open a WhatsApp message to this number
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyPGJ70OnVomJ_x5sPLwIUW3cXAnjy87wwijNwErkAsJGQl3B_8Z9MYkxT7caWYXkmkWA/exec';                 // paste your Google Apps Script "Web app" URL here (ends in /exec)
 const TYPEFORM_ID = '';               // paste your Typeform form ID here (e.g. 'aB3dEf9X'); leave '' to use the built-in form
 const RSVP_EMAIL = 'kiprutobrenton@gmail.com'; // fallback if no WhatsApp number
 /* ====================== */
@@ -340,12 +341,20 @@ document.getElementById('form').addEventListener('submit',e=>{
   const d=Object.fromEntries(new FormData(e.target));
   try{const all=JSON.parse(localStorage.getItem('rsvps')||'[]');all.push(d);localStorage.setItem('rsvps',JSON.stringify(all))}catch(_){}
   const text=`RSVP — ${d.name}\n${d.attending}\nGuests: ${d.guests}\nDiet: ${d.diet||'-'}\nMessage: ${d.msg||'-'}`;
-  const url = WHATSAPP_NUMBER
-    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
-    : `mailto:${RSVP_EMAIL}?subject=${encodeURIComponent('Wedding RSVP — '+d.name)}&body=${encodeURIComponent(text)}`;
-  window.open(url,'_blank');
-  e.target.style.display='none';
-  document.getElementById('thanks').style.display='block';
+  const form=e.target, btn=form.querySelector('button[type=submit]'), thanks=document.getElementById('thanks');
+  const done=()=>{form.style.display='none';thanks.style.display='block'};
+  const fallback=()=>{
+    const url = WHATSAPP_NUMBER
+      ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
+      : `mailto:${RSVP_EMAIL}?subject=${encodeURIComponent('Wedding RSVP — '+d.name)}&body=${encodeURIComponent(text)}`;
+    window.open(url,'_blank');done();
+  };
+  if(!SHEET_URL){fallback();return}
+  btn.disabled=true;btn.textContent='Sending…';
+  // Google Apps Script web app: posts a row to the Google Sheet
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)})
+    .then(done)
+    .catch(()=>{btn.disabled=false;btn.textContent='Send RSVP';alert('Sorry, we could not send your RSVP. Please try again, or we will open WhatsApp/email instead.');fallback()});
 });
 </script>
 </body>
