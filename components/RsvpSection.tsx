@@ -4,21 +4,21 @@ import { useState, type FormEvent } from 'react';
 import { siteConfig } from '@/lib/site-config';
 import type { GuestInfo } from '@/lib/types';
 
-type Props = { guest?: GuestInfo; token?: string };
+type Props = { guest?: GuestInfo | null };
 
-export default function RsvpSection({ guest, token }: Props) {
+export default function RsvpSection({ guest }: Props) {
   return (
-    <section className="reveal" id="rsvp">
+    <section className="reveal section" id="rsvp">
       <p className="eyebrow">Kindly reply by {siteConfig.rsvpDeadline}</p>
       <h2>RSVP</h2>
-      {guest && token ? <InviteForm guest={guest} token={token} /> : <PublicForm />}
+      {guest ? <InviteForm guest={guest} /> : <PublicForm />}
     </section>
   );
 }
 
 /* ---------------- Private invitation: saved to Supabase, tied to the guest ---------------- */
 
-function InviteForm({ guest, token }: { guest: GuestInfo; token: string }) {
+function InviteForm({ guest }: { guest: GuestInfo }) {
   const limit = guest.guestLimit;
   const ex = guest.existing;
   const [attending, setAttending] = useState<'yes' | 'no' | ''>(ex ? (ex.attending ? 'yes' : 'no') : '');
@@ -46,7 +46,6 @@ function InviteForm({ guest, token }: { guest: GuestInfo; token: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          token,
           attending: attending === 'yes',
           attendeeNames: attending === 'yes' ? names : [],
           dietary: attending === 'yes' ? dietary : '',

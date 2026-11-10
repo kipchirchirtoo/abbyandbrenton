@@ -1,13 +1,29 @@
 import { getAdminClient } from '@/lib/supabase/admin';
 import { getInvitation, parseRsvpBody } from '@/lib/invitations/validation';
+import { getSessionToken } from '@/lib/guest-session';
 import { hashInvitationToken, isWellFormedToken } from '@/lib/invitations/tokens';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  // Same-origin only (the guest cookie is SameSite=Lax; this is defence in depth).
+  const origin = req.headers.get('origin');
+  const host = req.headers.get('host');
+  if (origin && host && new URL(origin).host !== host) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   // Rate limit per IP, and separately per invitation, to blunt automated submissions.
   if (!rateLimit(`rsvp-ip:${clientIp(req)}`, 10, 10 * 60_000)) {
+    return Response.json({ error: 'Too many attempts. Please wait a few minutes and try again.' }, { status: 429 });
+  }
+
+  const token = await getSessionToken();
+  if (!isWellFormedToken(token)) {
+    return Response.json({ error: 'Please open your personal invitation link to reply.' }, { status: 403 });
+  }
+  if (!rateLimit(`rsvp-token:${hashInvitationToken(token)}`, 8, 10 * 60_000)) {
     return Response.json({ error: 'Too many attempts. Please wait a few minutes and try again.' }, { status: 429 });
   }
 
@@ -16,13 +32,6 @@ export async function POST(req: Request) {
     body = await req.json();
   } catch {
     return Response.json({ error: 'Invalid request.' }, { status: 400 });
-  }
-  const token = (body as { token?: unknown } | null)?.token;
-  if (!isWellFormedToken(token)) {
-    return Response.json({ error: 'This invitation link is not valid.' }, { status: 403 });
-  }
-  if (!rateLimit(`rsvp-token:${hashInvitationToken(token)}`, 8, 10 * 60_000)) {
-    return Response.json({ error: 'Too many attempts. Please wait a few minutes and try again.' }, { status: 429 });
   }
 
   try {

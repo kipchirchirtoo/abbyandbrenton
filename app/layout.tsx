@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './site.css';
 
+// Deliberately minimal: this applies to EVERY page, including the private-access screen.
+// Event details (date, venue) are added only by the (site) layout when the site is public.
 export const metadata: Metadata = {
-  title: 'Abigael & Brenton — Wedding Invitation',
-  description: 'Join us as Abigael & Brenton get married on 15 January 2027 at Sultan Palace, Kikambala, Mtwapa.',
+  title: 'Abigael & Brenton',
 };
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
