@@ -72,8 +72,8 @@ export default async function HomePage() {
         <div className="split-img" style={{ backgroundImage: "url('/photos/gallery/bride-2.jpg')" }} />
         <div className="split-text">
           <p className="eyebrow">Dress code</p>
-          <h2>Garden elegance</h2>
-          <p className="lead">Formal, graceful and made for the coast. Sage, blush, ivory and gold are all welcome.</p>
+          <h2>Elegant · Coastal · Garden Chic</h2>
+          <p className="lead">Champagne, warm taupe, soft mocha, dusty rose, terracotta or antique gold. Please avoid white, olive green, black, beige and any colour not in our palette.</p>
           <Link className="btn" href="/dress-code">See the dress code</Link>
         </div>
       </section>

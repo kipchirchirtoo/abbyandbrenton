@@ -63,7 +63,7 @@ export const days: Day[] = [
     date: '15 January 2027',
     title: 'The Wedding Day',
     summary: 'The ceremony, the reception and a night of celebration.',
-    dress: 'Formal · garden attire',
+    dress: 'Elegant · coastal · garden chic',
     events: [
       { time: '1:30 PM', title: 'Guest arrival', text: 'Welcome drinks in the garden.' },
       { time: '2:00 PM', title: 'Ceremony', text: 'Exchange of vows.' },
@@ -90,26 +90,49 @@ export const days: Day[] = [
 
 /* ---------------- Dress code ---------------- */
 export const dressCode = {
-  headline: 'Formal · Garden Elegance',
+  headline: 'Elegant · Coastal · Garden Chic',
+  theme: 'Sophisticated, romantic, warm and natural.',
   intro:
-    'We would love to see you dressed for a beautiful garden celebration by the coast. Think elegant, comfortable and ready to dance.',
+    'Guests are invited to wear elegant, breathable and comfortable outfits suited to a garden and coastal wedding. Think warm neutrals, earthy tones, soft romantic colours and flowing fabrics.',
+  summary:
+    'Dress elegantly in champagne, warm taupe, soft mocha, dusty rose, terracotta or antique gold, and embrace a relaxed but sophisticated coastal garden-chic look.',
+  /** Official guest colour palette. */
   palette: [
-    { name: 'Sage', color: '#8a9a7b' },
-    { name: 'Blush', color: '#ecd9d0' },
-    { name: 'Ivory', color: '#f6efe0' },
-    { name: 'Champagne gold', color: '#c9a95f' },
-    { name: 'Chocolate', color: '#5a3a2a' },
+    { name: 'Champagne', color: '#E7D2B5' },
+    { name: 'Warm Taupe', color: '#B39886' },
+    { name: 'Soft Mocha', color: '#8F6B56' },
+    { name: 'Dusty Rose', color: '#C5898E' },
+    { name: 'Terracotta', color: '#B56346' },
+    { name: 'Antique Gold', color: '#C9A65B' },
   ],
-  ladies: 'Floor-length or midi dresses, elegant jumpsuits or traditional African attire. Block heels or wedges are best for the garden.',
-  gentlemen: 'Suit or smart traditional wear. A tie is optional. Lighter fabrics will keep you comfortable in the coastal weather.',
-  avoid: 'Please avoid white or full ivory, which is reserved for the bride.',
+  ladies: [
+    'Flowing, elegant dresses',
+    'Satin, chiffon or silk-blend fabrics',
+    'Long dresses, midi dresses or sophisticated evening dresses',
+    'Lightweight, breathable fabrics',
+    'Colours taken from the official wedding palette',
+  ],
+  gentlemen: [
+    'Tailored suits or smart linen outfits',
+    'Lightweight shirts and trousers',
+    'Cream, taupe, mocha, terracotta or champagne combinations',
+    'Smart, polished and comfortable footwear',
+  ],
+  /** Colours to avoid. `color` is only used to draw the swatch. */
+  avoid: [
+    { name: 'White', color: '#ffffff', note: 'Reserved for the bride' },
+    { name: 'Olive green', color: '#6b7a3a', note: 'Reserved for the bridal party' },
+    { name: 'Black', color: '#141414', note: 'Keeps the look light and cohesive' },
+    { name: 'Beige', color: '#d8c8a8', note: 'Too close to our champagne. Please choose champagne instead' },
+    { name: 'Any other colour', color: 'rainbow', note: 'Please keep to the six colours of the palette' },
+  ],
 };
 
 /* ---------------- FAQs ---------------- */
 // TODO: review each answer and edit to match your plans.
 export const faqs: { q: string; a: string }[] = [
   { q: 'When and where is the wedding?', a: 'Friday, 15 January 2027 at Sultan Palace, Kikambala, Mtwapa. Guests are welcome from 1:30 PM and the ceremony begins at 2:00 PM.' },
-  { q: 'What is the dress code?', a: 'Formal garden elegance. See the Dress Code page for colours and ideas.' },
+  { q: 'What is the dress code?', a: 'Elegant, coastal garden chic. Please wear champagne, warm taupe, soft mocha, dusty rose, terracotta or antique gold. Please avoid white, olive green, black, beige and any colour not in our palette. See the Dress Code page for details.' },
   { q: 'How do I RSVP, and by when?', a: 'Use the RSVP page. Kindly reply by 15 December 2026 so we can plan seating and catering.' },
   { q: 'Can I bring a plus one or children?', a: 'Your personal invitation shows exactly how many guests it covers. If you need to change this, please contact us before the RSVP deadline.' },
   { q: 'Where can I stay?', a: 'Visit the Book a Room page. We recommend booking early as the coast is busy in January.' },
