@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import PageHero from '@/components/site/PageHero';
 import PrivateAccess from '@/components/PrivateAccess';
 import { getSiteAccess } from '@/lib/guest-session';
-import { dressCode, days } from '@/lib/content';
+import { dressCode } from '@/lib/content';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Dress Code — Abigael & Brenton' };
@@ -68,15 +68,6 @@ export default async function DressCode() {
         <p className="pull-quote">{dressCode.summary}</p>
       </section>
 
-      <section className="reveal section">
-        <p className="eyebrow">Each day</p>
-        <h2>What to wear, day by day</h2>
-        <ul className="dress-list">
-          {days.map((d) => (
-            <li key={d.key}><b>{d.weekday}</b><span>{d.dress}</span></li>
-          ))}
-        </ul>
-      </section>
     </>
   );
 }

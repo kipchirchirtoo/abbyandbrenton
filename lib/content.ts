@@ -39,7 +39,6 @@ export type Day = {
   date: string;
   title: string;
   summary: string;
-  dress: string;
   events: DayEvent[];
 };
 
@@ -51,7 +50,6 @@ export const days: Day[] = [
     date: '14 January 2027',
     title: 'Welcome Evening',
     summary: 'Settle in, greet family and friends and warm up for the big day.',
-    dress: 'Smart casual',
     events: [
       { time: '4:00 PM', title: 'Guest arrivals', text: 'Check in and settle in at Sultan Palace.' },
       { time: '7:00 PM', title: 'Welcome dinner', text: 'An easy evening of food, music and good company.' },
@@ -63,7 +61,6 @@ export const days: Day[] = [
     date: '15 January 2027',
     title: 'The Wedding Day',
     summary: 'The ceremony, the reception and a night of celebration.',
-    dress: 'Elegant · coastal · garden chic',
     events: [
       { time: '1:30 PM', title: 'Guest arrival', text: 'Welcome drinks in the garden.' },
       { time: '2:00 PM', title: 'Ceremony', text: 'Exchange of vows.' },
@@ -79,7 +76,6 @@ export const days: Day[] = [
     date: '16 January 2027',
     title: 'Thanksgiving Brunch',
     summary: 'A relaxed morning to give thanks, share stories and say goodbye.',
-    dress: 'Relaxed · resort wear',
     events: [
       { time: '10:00 AM', title: 'Brunch', text: 'A leisurely brunch with the newlyweds.' },
       { time: '12:30 PM', title: 'Thanksgiving & blessings', text: 'A short moment of gratitude together.' },

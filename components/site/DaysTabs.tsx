@@ -22,7 +22,6 @@ export default function DaysTabs({ initial = 'friday' }: { initial?: string }) {
         <p className="eyebrow">{day.weekday} · {day.date}</p>
         <h2>{day.title}</h2>
         <p className="lead">{day.summary}</p>
-        <p className="dress-chip">Dress: {day.dress}</p>
         <div className="timeline">
           {day.events.map((e, i) => (
             <div className="t" key={e.time + e.title} style={{ animationDelay: `${i * 90}ms` }}>
