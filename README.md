@@ -40,6 +40,23 @@ unless the visitor has a valid invitation. **Every page checks access itself** (
 - Register `https://YOUR-SITE/api/mpesa/callback/<MPESA_CALLBACK_SECRET>` as the callback. Results appear at `/admin/gifts`
   (phone numbers are stored masked).
 
+## Room bookings (Paystack)
+
+Guests pick a room on **Book a Room**, enter their details and pay on Paystack's hosted checkout (cards / M-Pesa).
+Every booking, with the guest's name, email, phone, dates, room and total, appears at `/admin/bookings`
+(filter, cancel unpaid ones, export CSV). Money settles to the **bank account set in your Paystack dashboard**.
+
+- **Hotels, rooms, prices and photos** are in `lib/content.ts` (`stay.hotels`). Rooms with `published: false` are
+  hidden from guests and cannot be booked. Prices are whole KES per room per night.
+- The **server** computes the total; the browser never sets a price.
+- A booking is only confirmed when Paystack confirms the payment **and** the amount and currency match what the server priced
+  (webhook with HMAC-SHA512 signature check, plus a direct verify call when the guest returns). Mismatches go to "review".
+- Set the webhook in Paystack: Settings → API Keys & Webhooks → `https://YOUR-SITE/api/paystack/webhook`.
+- Use `sk_test_…` while testing; switch to `sk_live_…` for real money. KES availability depends on your Paystack account.
+- Set `BOOKING_PREVIEW=true` locally only, to preview the SAMPLE rooms.
+- A confirmation email is sent through Resend when it is configured.
+- Refunds are made in the Paystack dashboard (the admin page cannot move money).
+
 ## Setup checklist
 
 1. Supabase: run `supabase/migrations/*.sql` in order (001 invitations, 002 gifts). RLS on, no public policies.
@@ -53,4 +70,4 @@ unless the visitor has a valid invitation. **Every page checks access itself** (
 - Rate limiting is in-memory per serverless instance (use Upstash/Vercel KV for a hard limit).
 - Admin login is one shared password with a signed session cookie (not Supabase Auth).
 - No email delivery/bounce tracking yet (needs Resend webhooks).
-- Room requests open WhatsApp with a pre-filled message; nothing is stored or booked automatically.
+- Room availability is not tracked (no inventory limit per room type); admin reviews bookings in `/admin/bookings`.

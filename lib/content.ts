@@ -95,11 +95,11 @@ export const faqs: { q: string; a: string }[] = [
   { q: 'What is the dress code?', a: 'Elegant, coastal garden chic. Please wear champagne, warm taupe, soft mocha, dusty rose, terracotta or antique gold. Please avoid white, olive green, black, beige and any colour not in our palette. See the Dress Code page for details.' },
   { q: 'How do I RSVP, and by when?', a: 'Use the RSVP page. Kindly reply by 15 December 2026 so we can plan seating and catering.' },
   { q: 'Can I bring a plus one or children?', a: 'Your personal invitation shows exactly how many guests it covers. If you need to change this, please contact us before the RSVP deadline.' },
-  { q: 'Where can I stay?', a: 'Visit the Book a Room page. We recommend booking early as the coast is busy in January.' },
+  { q: 'Where can I stay?', a: 'You can book and pay for a room on the Book a Room page. We recommend booking early as the coast is busy in January.' },
   { q: 'Is there parking?', a: 'Yes. Please follow the ushers’ directions when you arrive. We encourage carpooling where you can.' },
   { q: 'Will photos be taken?', a: 'Our photographers will capture the day. Please enjoy the moment and share your favourites with ' + couple.hashtag + '.' },
   { q: 'How can I send a gift?', a: 'Your presence is the greatest gift. If you would like to contribute, use the M-Pesa Gift page.' },
-  { q: 'Who do I contact with questions?', a: 'Reach out to the couple or the bridal team on the WhatsApp number shown on the Book a Room page.' },
+  { q: 'Who do I contact with questions?', a: 'Please reach out to the couple or the bridal team and we will be glad to help.' },
 ];
 
 /* ---------------- Bridal team ---------------- */
@@ -116,27 +116,50 @@ export const bridalStory = {
   quote: 'We did not choose them because they are perfect for the wedding. We chose them because they are perfect for us.',
 };
 
-/* ---------------- Stay / rooms ---------------- */
-// TODO: confirm real booking details with the venue / your coordinator.
+/* ---------------- Stay / rooms (booked and paid on the website via Paystack) ---------------- */
+/**
+ * HOW TO ADD YOUR REAL HOTELS AND ROOMS
+ *  1. Replace the sample entries below with the real hotel(s) and room types.
+ *  2. Put the pictures in /public/photos/rooms/ and set `image: '/photos/rooms/<file>.jpg'`.
+ *  3. Set `published: true` on every room you want guests to be able to book, and remove `sample: true`.
+ * Prices are WHOLE KES per room per night. The server always recomputes the total; the browser never sets a price.
+ * Rooms with `published: false` are hidden from guests and cannot be booked.
+ */
+export type Room = {
+  id: string;
+  name: string;
+  description: string;
+  pricePerNight: number; // whole KES
+  capacity: number; // max guests per room
+  image?: string;
+  published: boolean;
+  sample?: boolean;
+};
+export type Hotel = { id: string; name: string; area: string; description: string; image?: string; mapQuery: string; rooms: Room[] };
+
 export const stay = {
   intro:
-    'We would love for you to stay close and celebrate with us. Send a room request and the team will confirm availability and rates with you.',
-  options: [
+    'We would love for you to stay close and celebrate with us. Choose your room, pay securely online, and your booking is confirmed straight away.',
+  currency: 'KES',
+  // Dates guests may book between (inclusive of check-in, exclusive of check-out day beyond max).
+  minDate: '2027-01-12',
+  maxDate: '2027-01-19',
+  defaultCheckIn: '2027-01-15',
+  defaultCheckOut: '2027-01-16',
+  hotels: [
     {
-      name: 'Sultan Palace (venue)',
-      note: 'Stay on-site and walk to the celebrations.',
-      tag: 'Closest',
+      id: 'sultan-palace',
+      name: 'Sultan Palace',
+      area: 'Kikambala, Mtwapa',
+      description: 'Hotel details and photos coming soon.',
       mapQuery: 'Sultan Palace Kikambala Mtwapa Kenya',
+      rooms: [
+        // SAMPLE ONLY: placeholders so the booking flow can be previewed. Not real rooms or prices.
+        { id: 'standard', name: 'Standard Room', description: 'Sample room (details to come).', pricePerNight: 10000, capacity: 2, published: false, sample: true },
+        { id: 'deluxe', name: 'Deluxe Room', description: 'Sample room (details to come).', pricePerNight: 15000, capacity: 3, published: false, sample: true },
+      ],
     },
-    {
-      name: 'Hotels around Kikambala & Mtwapa',
-      note: 'More choices along the North Coast, a short drive from the venue.',
-      tag: 'Nearby',
-      mapQuery: 'hotels near Sultan Palace Kikambala Mtwapa Kenya',
-    },
-  ],
-  checkIn: '2027-01-15',
-  checkOut: '2027-01-16',
+  ] as Hotel[],
 };
 
 /* ---------------- Gifts ---------------- */
@@ -147,5 +170,3 @@ export const gift = {
   accountName: 'Abigael & Brenton Wedding',
 };
 
-/** WhatsApp number (international format, no +) used for room requests. TODO: confirm. */
-export const contactWhatsapp = '254716355462';
