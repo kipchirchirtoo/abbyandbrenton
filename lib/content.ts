@@ -22,7 +22,7 @@ export const nav = [
   { href: '/our-story', label: 'Our Story' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/bridal-team', label: 'Bridal Team' },
-  { href: '/programme', label: 'The Days' },
+  { href: '/programme', label: 'Programme' },
   { href: '/dress-code', label: 'Dress Code' },
   { href: '/location', label: 'Location' },
   { href: '/stay', label: 'Book a Room' },
@@ -31,58 +31,22 @@ export const nav = [
   { href: '/rsvp', label: 'RSVP' },
 ] as const;
 
-/* ---------------- The three days (Thursday · Friday · Saturday) ---------------- */
+/* ---------------- The wedding day (Friday only) ---------------- */
 export type DayEvent = { time: string; title: string; text: string };
-export type Day = {
-  key: string;
-  weekday: string;
-  date: string;
-  title: string;
-  summary: string;
-  events: DayEvent[];
-};
 
-export const days: Day[] = [
-  {
-    // TODO: confirm Thursday plans
-    key: 'thursday',
-    weekday: 'Thursday',
-    date: '14 January 2027',
-    title: 'Welcome Evening',
-    summary: 'Settle in, greet family and friends and warm up for the big day.',
-    events: [
-      { time: '4:00 PM', title: 'Guest arrivals', text: 'Check in and settle in at Sultan Palace.' },
-      { time: '7:00 PM', title: 'Welcome dinner', text: 'An easy evening of food, music and good company.' },
-    ],
-  },
-  {
-    key: 'friday',
-    weekday: 'Friday',
-    date: '15 January 2027',
-    title: 'The Wedding Day',
-    summary: 'The ceremony, the reception and a night of celebration.',
-    events: [
-      { time: '1:30 PM', title: 'Guest arrival', text: 'Welcome drinks in the garden.' },
-      { time: '2:00 PM', title: 'Ceremony', text: 'Exchange of vows.' },
-      { time: '3:30 PM', title: 'Photos & cocktails', text: 'Canapés and live acoustic music.' },
-      { time: '5:00 PM', title: 'Reception dinner', text: 'Speeches, toasts and the first dance.' },
-      { time: '9:00 PM', title: 'Dancing', text: 'Party until late.' },
-    ],
-  },
-  {
-    // TODO: confirm Saturday plans
-    key: 'saturday',
-    weekday: 'Saturday',
-    date: '16 January 2027',
-    title: 'Thanksgiving Brunch',
-    summary: 'A relaxed morning to give thanks, share stories and say goodbye.',
-    events: [
-      { time: '10:00 AM', title: 'Brunch', text: 'A leisurely brunch with the newlyweds.' },
-      { time: '12:30 PM', title: 'Thanksgiving & blessings', text: 'A short moment of gratitude together.' },
-      { time: '2:00 PM', title: 'Farewells', text: 'Safe travels home.' },
-    ],
-  },
-];
+export const weddingDay = {
+  weekday: 'Friday',
+  date: '15 January 2027',
+  title: 'The Wedding Day',
+  summary: 'The ceremony, the reception and a night of celebration.',
+  events: [
+    { time: '1:30 PM', title: 'Guest arrival', text: 'Welcome drinks in the garden.' },
+    { time: '2:00 PM', title: 'Ceremony', text: 'Exchange of vows.' },
+    { time: '3:30 PM', title: 'Photos & cocktails', text: 'Canapés and live acoustic music.' },
+    { time: '5:00 PM', title: 'Reception dinner', text: 'Speeches, toasts and the first dance.' },
+    { time: '9:00 PM', title: 'Dancing', text: 'Party until late.' },
+  ] as DayEvent[],
+};
 
 /* ---------------- Dress code ---------------- */
 export const dressCode = {
@@ -132,7 +96,6 @@ export const faqs: { q: string; a: string }[] = [
   { q: 'How do I RSVP, and by when?', a: 'Use the RSVP page. Kindly reply by 15 December 2026 so we can plan seating and catering.' },
   { q: 'Can I bring a plus one or children?', a: 'Your personal invitation shows exactly how many guests it covers. If you need to change this, please contact us before the RSVP deadline.' },
   { q: 'Where can I stay?', a: 'Visit the Book a Room page. We recommend booking early as the coast is busy in January.' },
-  { q: 'What is happening on Thursday and Saturday?', a: 'We are celebrating over three days. See The Days page for the full programme.' },
   { q: 'Is there parking?', a: 'Yes. Please follow the ushers’ directions when you arrive. We encourage carpooling where you can.' },
   { q: 'Will photos be taken?', a: 'Our photographers will capture the day. Please enjoy the moment and share your favourites with ' + couple.hashtag + '.' },
   { q: 'How can I send a gift?', a: 'Your presence is the greatest gift. If you would like to contribute, use the M-Pesa Gift page.' },
@@ -157,7 +120,7 @@ export const bridalStory = {
 // TODO: confirm real booking details with the venue / your coordinator.
 export const stay = {
   intro:
-    'We would love for you to stay close and celebrate all three days. Send a room request and the team will confirm availability and rates with you.',
+    'We would love for you to stay close and celebrate with us. Send a room request and the team will confirm availability and rates with you.',
   options: [
     {
       name: 'Sultan Palace (venue)',
@@ -172,8 +135,8 @@ export const stay = {
       mapQuery: 'hotels near Sultan Palace Kikambala Mtwapa Kenya',
     },
   ],
-  checkIn: '2027-01-14',
-  checkOut: '2027-01-17',
+  checkIn: '2027-01-15',
+  checkOut: '2027-01-16',
 };
 
 /* ---------------- Gifts ---------------- */

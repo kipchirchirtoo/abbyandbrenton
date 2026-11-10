@@ -6,8 +6,8 @@ The original static version is kept in `legacy/`.
 
 ## Pages (menu)
 
-The Day · Our Story · Gallery (Groom / Bride / Family / Bridal Team / Event Location) · Bridal Team · The Days
-(Thursday / Friday / Saturday) · Dress Code · Location · Book a Room · FAQs · M-Pesa Gift · RSVP
+The Day · Our Story · Gallery (Groom / Bride / Family / Bridal Team / Event Location) · Bridal Team · Programme
+(wedding day only) · Dress Code · Location · Book a Room · FAQs · M-Pesa Gift · RSVP
 
 **All wording, days, FAQs, dress code, hotels and the gift number live in `lib/content.ts`.**
 Items marked `TODO` there are placeholders to confirm. Photos are in `public/photos/` (gallery data: `lib/gallery.json`).

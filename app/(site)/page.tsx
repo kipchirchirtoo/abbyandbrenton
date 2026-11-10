@@ -3,7 +3,7 @@ import HeroSlideshow from '@/components/site/HeroSlideshow';
 import Countdown, { AddToCalendar } from '@/components/site/Countdown';
 import PrivateAccess from '@/components/PrivateAccess';
 import { getSiteAccess } from '@/lib/guest-session';
-import { couple, days, venue } from '@/lib/content';
+import { couple, venue, weddingDay } from '@/lib/content';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +26,7 @@ export default async function HomePage() {
           <p className="date sub">{venue.name} · {venue.area}</p>
           <div className="hero-cta">
             <Link href="/rsvp" className="btn solid light">RSVP now</Link>
-            <Link href="/programme" className="btn ghost">See the days</Link>
+            <Link href="/programme" className="btn ghost">See the programme</Link>
           </div>
         </div>
         <span className="scroll">Scroll ↓</span>
@@ -52,20 +52,18 @@ export default async function HomePage() {
         <AddToCalendar />
       </section>
 
-      <section className="reveal section wide">
-        <p className="eyebrow">Three days of celebration</p>
-        <h2>Join us from Thursday to Saturday</h2>
-        <div className="day-cards">
-          {days.map((d) => (
-            <Link key={d.key} href="/programme" className={`day-mini${d.key === 'friday' ? ' main' : ''}`}>
-              <small>{d.weekday}</small>
-              <b>{d.date.replace(' 2027', '')}</b>
-              <h3>{d.title}</h3>
-              <p>{d.summary}</p>
-              <span>View programme →</span>
-            </Link>
+      <section className="reveal section">
+        <p className="eyebrow">The wedding day</p>
+        <h2>{weddingDay.weekday}, {weddingDay.date}</h2>
+        <div className="timeline compact">
+          {weddingDay.events.map((e) => (
+            <div className="t" key={e.time + e.title}>
+              <time>{e.time}</time>
+              <div><h3>{e.title}</h3><p>{e.text}</p></div>
+            </div>
           ))}
         </div>
+        <Link className="btn" href="/programme">View the programme</Link>
       </section>
 
       <section className="reveal section wide split">
