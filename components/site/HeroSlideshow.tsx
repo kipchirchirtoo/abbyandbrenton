@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
-const SLIDES = [
+// `pos` = which vertical band of a tall photo stays visible on wide screens (keeps faces / rings in view).
+// The proposal photos come first: they are the first thing every guest sees.
+// `portrait` photos fill the screen on phones; on wide screens they are shown whole (sharp) over a blurred copy of themselves.
+const SLIDES: { src: string; land: boolean; pos?: string; portrait?: boolean }[] = [
+  { src: '/photos/proposal/hero-1.jpg', land: false, pos: 'center 28%', portrait: true },
+  { src: '/photos/proposal/hero-2.jpg', land: false, pos: 'center 34%', portrait: true },
+  { src: '/photos/proposal/hero-3.jpg', land: false, pos: 'center 20%', portrait: true },
+  { src: '/photos/proposal/hero-4.jpg', land: false, pos: 'center 72%', portrait: true },
+  { src: '/photos/proposal/hero-5.jpg', land: false, pos: 'center 42%', portrait: true },
   { src: '/photos/hero1.jpg', land: false },
   { src: '/photos/hero2.jpg', land: true },
   { src: '/photos/hero3.jpg', land: false },
@@ -28,8 +36,12 @@ export default function HeroSlideshow() {
         {SLIDES.map((h, i) => (
           <div
             key={h.src}
-            className={`slide${h.land ? ' land' : ''}${i === slide ? ' on' : ''}`}
-            style={i < seen ? { backgroundImage: `url('${h.src}')` } : undefined}
+            className={`slide${h.land ? ' land' : ''}${h.portrait ? ' portrait' : ''}${i === slide ? ' on' : ''}`}
+            style={
+              i < seen
+                ? ({ backgroundImage: `url('${h.src}')`, '--img': `url('${h.src}')`, ...(h.pos ? { backgroundPosition: h.pos } : {}) } as React.CSSProperties)
+                : undefined
+            }
           />
         ))}
       </div>

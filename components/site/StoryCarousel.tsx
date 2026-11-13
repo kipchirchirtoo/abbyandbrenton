@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 const GALLERY: [string, string][] = [
+  // The proposal, in the order it unfolds.
+  ['/photos/proposal/story-1.jpg', 'Abigael and Brenton at the heart-shaped flower arch'],
+  ['/photos/proposal/story-2.jpg', 'Abigael smiling in Brenton’s arms, her ring on show'],
+  ['/photos/proposal/story-3.jpg', 'Brenton and Abigael sharing a kiss'],
+  ['/photos/proposal/story-4.jpg', 'Their hands together, the engagement ring catching the light'],
+  ['/photos/proposal/story-5.jpg', 'The engagement ring'],
   ['/photos/g1.jpg', 'Abigael with a fan'],
   ['/photos/g2.jpg', 'Abigael and Brenton embracing'],
   ['/photos/g3.jpg', 'Abigael at the arch'],

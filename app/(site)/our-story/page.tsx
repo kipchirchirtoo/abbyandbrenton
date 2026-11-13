@@ -13,7 +13,13 @@ export default async function OurStory() {
 
   return (
     <>
-      <PageHero eyebrow="Our story" title="How it began" sub="A simple meeting, a shared cup of coffee, and a conversation that changed everything." image="/photos/hero1.jpg" />
+      <PageHero eyebrow="Our story" title="How it began" sub="A simple meeting, a shared cup of coffee, and a conversation that changed everything." image="/photos/proposal/hero-3.jpg" collage={[
+        { src: '/photos/proposal/story-1.jpg', pos: 'center 22%' },
+        { src: '/photos/proposal/story-2.jpg', pos: 'center 30%' },
+        { src: '/photos/proposal/story-3.jpg', pos: 'center 18%' },
+        { src: '/photos/proposal/story-4.jpg', pos: 'center 66%' },
+        { src: '/photos/proposal/story-5.jpg', pos: 'center 40%' },
+      ]} />
 
       <section className="reveal section">
         <p className="eyebrow">Once upon a time</p>

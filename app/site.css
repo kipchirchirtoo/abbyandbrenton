@@ -269,3 +269,18 @@ ul.tick li::before{content:"✓";position:absolute;left:0;color:var(--gold);font
 .admin small{color:var(--muted)}
 .admin small.warn{color:#8a3a31}
 @media (max-width:520px){.hotel-head img{width:100%;height:170px}}
+
+/* ---------- portrait photos in the hero slideshow ---------- */
+.slide.portrait::before,.slide.portrait::after{content:"";position:absolute;inset:0;display:none}
+@media (min-aspect-ratio:1/1){
+  .slide.portrait{background-image:none!important}
+  .slide.portrait::before{display:block;background:var(--img) center/cover no-repeat;filter:blur(30px) brightness(.85) saturate(1.1);transform:scale(1.2)}
+  .slide.portrait::after{display:block;background:var(--img) center/contain no-repeat}
+}
+
+/* ---------- page banner collage (side-by-side portrait photos) ---------- */
+.ph-collage{position:absolute;inset:0;display:flex;gap:3px;background:#1b2216}
+.ph-tile{position:relative;flex:1 1 0;overflow:hidden;animation:fade 1s both}
+.ph-tile>div{position:absolute;inset:0;background-size:cover;animation:kb 18s ease-out both}
+@media (max-width:900px){.ph-tile:nth-child(n+4){display:none}}
+@media (max-width:560px){.ph-tile:nth-child(n+3){display:none}}
