@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HeroSlideshow from '@/components/site/HeroSlideshow';
+import TravelScene from '@/components/site/TravelScene';
 import Countdown, { AddToCalendar } from '@/components/site/Countdown';
 import GalleryPreview from '@/components/site/GalleryPreview';
 import PrivateAccess from '@/components/PrivateAccess';
@@ -18,8 +19,9 @@ export default async function HomePage() {
     <>
       <header className="hero">
         <HeroSlideshow />
+        <TravelScene />
         <div className="hero-content">
-          <p className="eyebrow">Together with their families</p>
+          <p className="eyebrow">A destination wedding · together with their families</p>
           <h1 className="script">
             {couple.bride}<span className="amp">&amp;</span>{couple.groom}
           </h1>
@@ -91,7 +93,7 @@ export default async function HomePage() {
       </section>
 
       <section className="reveal cta-band">
-        <p className="eyebrow">Kindly reply by 15 December 2026</p>
+        <p className="eyebrow">Kindly reply by 30 December 2026</p>
         <h2>We can’t wait to celebrate with you</h2>
         <Link className="btn solid light" href="/rsvp">RSVP now</Link>
       </section>

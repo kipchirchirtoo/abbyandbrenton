@@ -299,3 +299,22 @@ button.room-img:disabled{cursor:default}
 .photo-count{position:absolute;right:10px;bottom:10px;font-style:normal;background:rgba(24,32,15,.72);color:#fff;font-size:.68rem;letter-spacing:.14em;padding:5px 11px;border-radius:20px}
 
 .home-mosaic a.mosaic-item{display:block;text-decoration:none}
+
+/* ---------- Destination scene: planes, a train and a car on the hero ---------- */
+.travel{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;color:rgba(255,255,255,.88)}
+.travel .plane{position:absolute;left:0;width:56px;opacity:.9;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));animation:fly 26s linear infinite}
+.travel .plane svg{display:block;width:100%;transform:scaleX(-1)}
+.travel .p1{top:14%}
+.travel .p2{top:26%;width:34px;opacity:.65;animation-duration:38s;animation-delay:-14s}
+@keyframes fly{from{transform:translateX(-120px)}to{transform:translateX(calc(100vw + 120px))}}
+.travel .ground{position:absolute;left:0;right:0;bottom:54px;height:34px}
+.travel .road{position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
+.travel .train{position:absolute;bottom:3px;left:0;width:170px;animation:drive 34s linear infinite}
+.travel .car{position:absolute;bottom:3px;left:0;width:48px;animation:driveback 18s linear infinite;animation-delay:-6s;transform:scaleX(-1)}
+@keyframes drive{from{transform:translateX(-200px)}to{transform:translateX(calc(100vw + 200px))}}
+@keyframes driveback{from{transform:translateX(calc(100vw + 80px)) scaleX(-1)}to{transform:translateX(-120px) scaleX(-1)}}
+@media (max-width:640px){.travel .ground{bottom:58px}.travel .train{width:120px}.travel .car{width:36px}.travel .plane{width:42px}}
+@media (prefers-reduced-motion:reduce){.travel .plane,.travel .train,.travel .car{animation:none}.travel .plane{left:60%}.travel .train{left:10%}.travel .car{left:70%}}
+.amenities{list-style:none;padding:0;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px}
+.amenities li{font-size:.72rem;padding:3px 9px;border-radius:99px;border:1px solid rgba(179,152,134,.55);color:var(--mocha,#8F6B56)}
+.dest-note{letter-spacing:.3em;text-transform:uppercase;font-size:.72rem;margin-top:10px;opacity:.85}

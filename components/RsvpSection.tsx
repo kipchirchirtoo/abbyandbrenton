@@ -144,6 +144,17 @@ function InviteForm({ guest }: { guest: GuestInfo }) {
 
 function PublicForm() {
   const [done, setDone] = useState(false);
+  if (siteConfig.rsvpFormUrl) {
+    return (
+      <div className="thanks-box">
+        <p className="lead">Please confirm your attendance on our RSVP form. It takes a minute.</p>
+        <a className="btn solid" href={siteConfig.rsvpFormUrl} target="_blank" rel="noopener noreferrer">
+          Open the RSVP form
+        </a>
+        <p className="hint">Kindly reply by {siteConfig.rsvpDeadline}.</p>
+      </div>
+    );
+  }
   const [sending, setSending] = useState(false);
 
   function submit(e: FormEvent<HTMLFormElement>) {

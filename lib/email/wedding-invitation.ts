@@ -29,7 +29,7 @@ export function renderInvitationEmail(opts: { name: string; link: string; guestL
   <p style="font-size:16px;color:#7d7a70;margin:4px 0 24px">Sultan Palace · Kikambala, Mtwapa</p>
   <p style="font-size:15px;line-height:1.6;margin:0 0 24px">${esc(plusLine)}<br>Open your private invitation to view the details and confirm your attendance.</p>
   <a href="${link}" style="display:inline-block;background:#5f7052;color:#ffffff;text-decoration:none;padding:14px 34px;font-size:13px;letter-spacing:3px;text-transform:uppercase">Open my invitation</a>
-  <p style="font-size:13px;color:#7d7a70;margin:28px 0 0">Kindly reply by 15 December 2026.</p>
+  <p style="font-size:13px;color:#7d7a70;margin:28px 0 0">Kindly reply by 30 December 2026.</p>
   <p style="font-size:12px;color:#9a968a;margin:20px 0 0;line-height:1.5">Your invitation link is personal. Please do not forward it.<br>If the button doesn't work, copy this link into your browser:<br><span style="word-break:break-all">${link}</span></p>
 </td></tr>
 </table></td></tr></table></body></html>`;
@@ -42,7 +42,7 @@ export function renderInvitationEmail(opts: { name: string; link: string; guestL
     plusLine,
     '',
     `Open your private invitation: ${opts.link}`,
-    'Kindly reply by 15 December 2026.',
+    'Kindly reply by 30 December 2026.',
     '',
     'Your invitation link is personal. Please do not forward it.',
   ].join('\n');

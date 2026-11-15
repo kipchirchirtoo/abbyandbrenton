@@ -107,6 +107,11 @@ export default function StayBooking(p: Props) {
                 <div className="room-body">
                   <h4>{r.name}</h4>
                   <p>{r.description}</p>
+                  {r.amenities && r.amenities.length > 0 && (
+                    <ul className="amenities">
+                      {r.amenities.map((a) => <li key={a}>{a}</li>)}
+                    </ul>
+                  )}
                   <p className="room-meta">Sleeps up to {r.capacity}</p>
                   <p className="room-price"><b>{kes(r.pricePerNight)}</b> <small>per room / night</small></p>
                   <button type="button" className="btn solid" onClick={() => choose(h.id, r.id)}>

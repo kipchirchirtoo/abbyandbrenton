@@ -13,7 +13,7 @@ export default async function Rsvp() {
 
   return (
     <>
-      <PageHero eyebrow="RSVP" title="Will you join us?" sub="Kindly reply by 15 December 2026." image="/photos/hero6.jpg" />
+      <PageHero eyebrow="RSVP" title="Will you join us?" sub="Kindly reply by 30 December 2026." image="/photos/hero6.jpg" />
       <RsvpSection guest={access.guest} />
     </>
   );

@@ -93,7 +93,7 @@ export const dressCode = {
 export const faqs: { q: string; a: string }[] = [
   { q: 'When and where is the wedding?', a: 'Friday, 15 January 2027 at Sultan Palace, Kikambala, Mtwapa. Guests are welcome from 1:30 PM and the ceremony begins at 2:00 PM.' },
   { q: 'What is the dress code?', a: 'Elegant, coastal garden chic. Please wear champagne, warm taupe, soft mocha, dusty rose, terracotta or antique gold. Please avoid white, olive green, black, beige and any colour not in our palette. See the Dress Code page for details.' },
-  { q: 'How do I RSVP, and by when?', a: 'Use the RSVP page. Kindly reply by 15 December 2026 so we can plan seating and catering.' },
+  { q: 'How do I RSVP, and by when?', a: 'Use the RSVP page. Kindly reply by 30 December 2026 so we can plan seating and catering.' },
   { q: 'Can I bring a plus one or children?', a: 'Your personal invitation shows exactly how many guests it covers. If you need to change this, please contact us before the RSVP deadline.' },
   { q: 'Where can I stay?', a: 'You can book and pay for a room on the Book a Room page. We recommend booking early as the coast is busy in January.' },
   { q: 'Is there parking?', a: 'Yes. Please follow the ushers’ directions when you arrive. We encourage carpooling where you can.' },
@@ -136,6 +136,7 @@ export type Room = {
   capacity: number; // max guests per room
   image?: string; // cover photo
   images?: string[]; // all photos of this room (shown in a gallery when clicked)
+  amenities?: string[]; // what the room includes, shown as a list on the card
   published: boolean;
   sample?: boolean;
 };
@@ -172,48 +173,64 @@ export const stay = {
       // The villa, its pool, gardens and the grounds.
       gallery: [80, 73, 76, 77, 74, 78, 65, 71, 40, 41, 48, 49, 50, 51, 53, 20, 22, 24].map(v),
       rooms: [
-        // NOTE: names, descriptions, prices and capacities below are SAMPLES: replace them with the real details.
+        // The five Sultan Palace categories. Prices, capacities and amenities below are SAMPLES: replace with the real details.
         {
-          id: 'beachfront-villa',
-          name: 'Beachfront Villa',
-          description: 'Sample description. Canopy beds, a private pool and the ocean at the end of the garden.',
+          id: 'villa',
+          name: 'Villa',
+          description: 'Sample description. A private villa with canopy beds, a private pool and the ocean at the end of the garden.',
           pricePerNight: 30000,
-          capacity: 6,
+          capacity: 8,
+          amenities: ['Private pool', 'Ocean view', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
           image: v(80),
           images: [80, 76, 73, 59, 64, 60, 72, 75, 67, 66, 79, 71, 78, 74, 77, 65, 57, 58, 62, 70, 68, 55, 61, 63, 56, 52, 54, 69].map(v),
           published: false,
           sample: true,
         },
         {
-          id: 'swahili-apartment',
-          name: 'Swahili Apartment',
+          id: 'townhouse-3br',
+          name: '3 Bedroom Town House',
+          description: 'Sample description. Two floors with three bedrooms, a private garden and a spacious living room.',
+          pricePerNight: 18000,
+          capacity: 6,
+          amenities: ['3 bedrooms', 'Private garden', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
+          image: v(41),
+          images: [41, 40, 39, 44, 47, 43, 42, 46, 45].map(v),
+          published: false,
+          sample: true,
+        },
+        {
+          id: 'apartment-3br',
+          name: '3 Bedroom Apartment',
           description: 'Sample description. Hand-carved wooden furniture, a balcony and a light-filled living area.',
-          pricePerNight: 12000,
-          capacity: 4,
+          pricePerNight: 15000,
+          capacity: 6,
+          amenities: ['3 bedrooms', 'Balcony', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
           image: v(4),
           images: [4, 9, 10, 11, 12, 15, 18, 13, 17, 82, 14, 3, 5, 16, 2, 8, 1, 6, 7, 23].map(v),
           published: false,
           sample: true,
         },
         {
-          id: 'teal-apartment',
-          name: 'Coastal Teal Apartment',
+          id: 'apartment-2br',
+          name: '2 Bedroom Apartment',
           description: 'Sample description. Fresh teal and white interiors with a balcony and a fully fitted kitchen.',
-          pricePerNight: 10000,
+          pricePerNight: 11000,
           capacity: 4,
+          amenities: ['2 bedrooms', 'Balcony', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
           image: v(27),
           images: [27, 28, 29, 33, 37, 30, 32, 36, 21, 31, 35, 26, 34, 38].map(v),
           published: false,
           sample: true,
         },
         {
-          id: 'garden-townhouse',
-          name: 'Garden Townhouse',
-          description: 'Sample description. Two floors with a private garden, a full kitchen and a spacious living room.',
-          pricePerNight: 15000,
-          capacity: 4,
-          image: v(41),
-          images: [41, 40, 39, 44, 47, 43, 42, 46, 45].map(v),
+          id: 'apartment-1br',
+          name: '1 Bedroom Apartment',
+          description: 'Sample description. A cosy apartment for two, with a balcony and a kitchenette.',
+          pricePerNight: 7000,
+          capacity: 2,
+          amenities: ['1 bedroom', 'Balcony', 'Kitchenette', 'Air conditioning', 'Wi-Fi'],
+          image: v(26),
+          images: [26, 34, 38, 21, 31, 35].map(v),
           published: false,
           sample: true,
         },
