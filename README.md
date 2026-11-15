@@ -48,6 +48,9 @@ Every booking, with the guest's name, email, phone, dates, room and total, appea
 
 - **Hotels, rooms, prices and photos** are in `lib/content.ts` (`stay.hotels`). Rooms with `published: false` are
   hidden from guests and cannot be booked. Prices are whole KES per room per night.
+- **Villa / room photos** are in `public/photos/villa/` (`v-01.jpg` … `v-82.jpg`, numbered like your original folder). In `lib/content.ts`,
+  `v(12)` means photo 12; move numbers between the hotel `gallery` and each room's `images` to re-organise. The villa gallery shows to everyone;
+  room cards (with prices) only appear once a room is `published: true`.
 - The **server** computes the total; the browser never sets a price.
 - A booking is only confirmed when Paystack confirms the payment **and** the amount and currency match what the server priced
   (webhook with HMAC-SHA512 signature check, plus a direct verify call when the guest returns). Mismatches go to "review".

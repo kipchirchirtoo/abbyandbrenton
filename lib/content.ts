@@ -118,24 +118,38 @@ export const bridalStory = {
 
 /* ---------------- Stay / rooms (booked and paid on the website via Paystack) ---------------- */
 /**
- * HOW TO ADD YOUR REAL HOTELS AND ROOMS
- *  1. Replace the sample entries below with the real hotel(s) and room types.
- *  2. Put the pictures in /public/photos/rooms/ and set `image: '/photos/rooms/<file>.jpg'`.
- *  3. Set `published: true` on every room you want guests to be able to book, and remove `sample: true`.
+ * HOW TO EDIT THE HOTEL AND ROOMS
+ *  - Photos live in /public/photos/villa/ as v-01.jpg ... v-82.jpg (numbers = the order of your original folder).
+ *    `v(12)` below means "photo number 12". Move numbers between lists to re-organise the photos.
+ *  - Replace the room NAMES, DESCRIPTIONS, PRICES and CAPACITY with the real details (everything marked SAMPLE / TODO).
+ *  - Set `published: true` on every room you want guests to be able to book, and remove `sample: true`.
  * Prices are WHOLE KES per room per night. The server always recomputes the total; the browser never sets a price.
- * Rooms with `published: false` are hidden from guests and cannot be booked.
+ * Rooms with `published: false` are hidden from guests and cannot be booked (their photos can still show in the gallery).
  */
+const v = (n: number) => `/photos/villa/v-${String(n).padStart(2, '0')}.jpg`;
+
 export type Room = {
   id: string;
   name: string;
   description: string;
   pricePerNight: number; // whole KES
   capacity: number; // max guests per room
-  image?: string;
+  image?: string; // cover photo
+  images?: string[]; // all photos of this room (shown in a gallery when clicked)
   published: boolean;
   sample?: boolean;
 };
-export type Hotel = { id: string; name: string; area: string; description: string; image?: string; mapQuery: string; rooms: Room[] };
+export type Hotel = {
+  id: string;
+  name: string;
+  area: string;
+  description: string;
+  image?: string;
+  /** Photos of the property and its grounds, shown to every visitor even before booking opens. */
+  gallery?: string[];
+  mapQuery: string;
+  rooms: Room[];
+};
 
 export const stay = {
   intro:
@@ -148,15 +162,61 @@ export const stay = {
   defaultCheckOut: '2027-01-16',
   hotels: [
     {
-      id: 'sultan-palace',
-      name: 'Sultan Palace',
+      id: 'villa',
+      // TODO: replace with the real property name.
+      name: 'The Villa & Apartments',
       area: 'Kikambala, Mtwapa',
-      description: 'Hotel details and photos coming soon.',
+      description: 'A private villa with a pool and ocean views, plus apartments set in lush tropical gardens. (TODO: add the real description.)',
       mapQuery: 'Sultan Palace Kikambala Mtwapa Kenya',
+      image: v(80),
+      // The villa, its pool, gardens and the grounds.
+      gallery: [80, 73, 76, 77, 74, 78, 65, 71, 40, 41, 48, 49, 50, 51, 53, 20, 22, 24].map(v),
       rooms: [
-        // SAMPLE ONLY: placeholders so the booking flow can be previewed. Not real rooms or prices.
-        { id: 'standard', name: 'Standard Room', description: 'Sample room (details to come).', pricePerNight: 10000, capacity: 2, published: false, sample: true },
-        { id: 'deluxe', name: 'Deluxe Room', description: 'Sample room (details to come).', pricePerNight: 15000, capacity: 3, published: false, sample: true },
+        // NOTE: names, descriptions, prices and capacities below are SAMPLES: replace them with the real details.
+        {
+          id: 'beachfront-villa',
+          name: 'Beachfront Villa',
+          description: 'Sample description. Canopy beds, a private pool and the ocean at the end of the garden.',
+          pricePerNight: 30000,
+          capacity: 6,
+          image: v(80),
+          images: [80, 76, 73, 59, 64, 60, 72, 75, 67, 66, 79, 71, 78, 74, 77, 65, 57, 58, 62, 70, 68, 55, 61, 63, 56, 52, 54, 69].map(v),
+          published: false,
+          sample: true,
+        },
+        {
+          id: 'swahili-apartment',
+          name: 'Swahili Apartment',
+          description: 'Sample description. Hand-carved wooden furniture, a balcony and a light-filled living area.',
+          pricePerNight: 12000,
+          capacity: 4,
+          image: v(4),
+          images: [4, 9, 10, 11, 12, 15, 18, 13, 17, 82, 14, 3, 5, 16, 2, 8, 1, 6, 7, 23].map(v),
+          published: false,
+          sample: true,
+        },
+        {
+          id: 'teal-apartment',
+          name: 'Coastal Teal Apartment',
+          description: 'Sample description. Fresh teal and white interiors with a balcony and a fully fitted kitchen.',
+          pricePerNight: 10000,
+          capacity: 4,
+          image: v(27),
+          images: [27, 28, 29, 33, 37, 30, 32, 36, 21, 31, 35, 26, 34, 38].map(v),
+          published: false,
+          sample: true,
+        },
+        {
+          id: 'garden-townhouse',
+          name: 'Garden Townhouse',
+          description: 'Sample description. Two floors with a private garden, a full kitchen and a spacious living room.',
+          pricePerNight: 15000,
+          capacity: 4,
+          image: v(41),
+          images: [41, 40, 39, 44, 47, 43, 42, 46, 45].map(v),
+          published: false,
+          sample: true,
+        },
       ],
     },
   ] as Hotel[],

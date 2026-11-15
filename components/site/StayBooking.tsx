@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import type { Hotel } from '@/lib/content';
+import Lightbox from './Lightbox';
 
 type Props = {
   hotels: Hotel[];
@@ -32,6 +33,7 @@ export default function StayBooking(p: Props) {
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [viewer, setViewer] = useState<{ title: string; images: string[]; index: number } | null>(null);
 
   if (flat.length === 0) {
     return (
@@ -77,6 +79,7 @@ export default function StayBooking(p: Props) {
 
       {p.hotels.map((h) => (
         <div key={h.id} className="hotel">
+          {!h.gallery?.length && (
           <div className="hotel-head">
             {h.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={h.image} alt={h.name} />}
             <div>
@@ -85,13 +88,22 @@ export default function StayBooking(p: Props) {
               <p className="hint left">{h.description}</p>
             </div>
           </div>
+          )}
           <div className="room-grid">
             {h.rooms.map((r) => (
               <article key={r.id} className={`room-card${sel === `${h.id}|${r.id}` ? ' picked' : ''}`}>
-                <div className="room-img" style={r.image ? { backgroundImage: `url('${r.image}')` } : undefined}>
+                <button
+                  type="button"
+                  className="room-img"
+                  style={r.image ? { backgroundImage: `url('${r.image}')` } : undefined}
+                  onClick={() => (r.images?.length || r.image) && setViewer({ title: r.name, images: r.images?.length ? r.images : [r.image!], index: 0 })}
+                  aria-label={`View photos of ${r.name}`}
+                  disabled={!r.image}
+                >
                   {!r.image && <span>Photo coming soon</span>}
                   {r.sample && <em className="sample-tag">SAMPLE</em>}
-                </div>
+                  {(r.images?.length ?? 0) > 1 && <em className="photo-count">▣ {r.images!.length} photos</em>}
+                </button>
                 <div className="room-body">
                   <h4>{r.name}</h4>
                   <p>{r.description}</p>
@@ -106,6 +118,8 @@ export default function StayBooking(p: Props) {
           </div>
         </div>
       ))}
+
+      {viewer && <Lightbox images={viewer.images} index={viewer.index} title={viewer.title} onIndex={(i) => setViewer({ ...viewer, index: i })} onClose={() => setViewer(null)} />}
 
       <form className="rsvp booking-form" ref={formRef} onSubmit={submit} id="book">
         <p className="eyebrow">Your booking</p>
