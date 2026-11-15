@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import HeroSlideshow from '@/components/site/HeroSlideshow';
 import Countdown, { AddToCalendar } from '@/components/site/Countdown';
+import GalleryPreview from '@/components/site/GalleryPreview';
 import PrivateAccess from '@/components/PrivateAccess';
 import { getSiteAccess } from '@/lib/guest-session';
 import { couple, venue, weddingDay } from '@/lib/content';
@@ -65,6 +66,8 @@ export default async function HomePage() {
         </div>
         <Link className="btn" href="/programme">View the programme</Link>
       </section>
+
+      <GalleryPreview />
 
       <section className="reveal section wide split">
         <div className="split-img" style={{ backgroundImage: "url('/photos/gallery/bride-2.jpg')" }} />
