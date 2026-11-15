@@ -1,0 +1,89 @@
+import { getAdminClient } from '@/lib/supabase/admin';
+import { getSessionToken, getSiteAccess } from '@/lib/guest-session';
+import { getInvitation } from '@/lib/invitations/validation';
+import { newReference, parseBooking } from '@/lib/bookings';
+import { initializeTransaction, paystackConfigured } from '@/lib/paystack';
+import { rateLimit, clientIp } from '@/lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * Creates a pending booking (price computed on the server) and a Paystack checkout.
+ * Returns { url } for the browser to redirect to. Nothing is confirmed until Paystack confirms payment.
+ */
+export async function POST(req: Request) {
+  const origin = req.headers.get('origin');
+  const host = req.headers.get('host');
+  if (origin && host && new URL(origin).host !== host) return Response.json({ error: 'Forbidden' }, { status: 403 });
+
+  if (!paystackConfigured() || !process.env.NEXT_PUBLIC_SITE_URL) {
+    return Response.json({ error: 'Online booking is not available yet. Please check back soon.' }, { status: 503 });
+  }
+  // Loose limit on every request (so form typos don't lock a guest out); strict limit below applies only to real bookings.
+  if (!rateLimit(`book-any:${clientIp(req)}`, 60, 10 * 60_000)) {
+    return Response.json({ error: 'Too many attempts. Please wait a few minutes and try again.' }, { status: 429 });
+  }
+  const access = await getSiteAccess();
+  if (!access.allowed) return Response.json({ error: 'Forbidden' }, { status: 403 });
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: 'Invalid request.' }, { status: 400 });
+  }
+  const parsed = parseBooking(body);
+  if ('error' in parsed) return Response.json({ error: parsed.error }, { status: 400 });
+  const { input, hotel, room, nights, total } = parsed;
+  // Each valid request creates a database row and a Paystack checkout, so it is limited more tightly.
+  if (!rateLimit(`book-create:${clientIp(req)}`, 8, 10 * 60_000)) {
+    return Response.json({ error: 'Too many bookings from this connection. Please wait a few minutes.' }, { status: 429 });
+  }
+
+  let guestId: string | null = null;
+  const token = await getSessionToken();
+  if (token) {
+    const inv = await getInvitation(token).catch(() => null);
+    if (inv && inv.status === 'valid') guestId = inv.guest.id;
+  }
+
+  const db = getAdminClient();
+  const reference = newReference();
+  const { error: insertError } = await db.from('wedding_bookings').insert({
+    reference,
+    guest_id: guestId,
+    full_name: input.fullName,
+    email: input.email,
+    phone: input.phone,
+    hotel_id: hotel.id,
+    hotel_name: hotel.name,
+    room_id: room.id,
+    room_name: room.name,
+    check_in: input.checkIn,
+    check_out: input.checkOut,
+    nights,
+    rooms: input.rooms,
+    guests: input.guests,
+    notes: input.notes || null,
+    currency: 'KES',
+    price_per_night: room.pricePerNight,
+    total,
+  });
+  if (insertError) return Response.json({ error: 'We could not save your booking. Please try again.' }, { status: 500 });
+
+  try {
+    const site = process.env.NEXT_PUBLIC_SITE_URL!.replace(/\/$/, '');
+    const { authorizationUrl } = await initializeTransaction({
+      email: input.email,
+      amountMinor: total * 100,
+      currency: 'KES',
+      reference,
+      callbackUrl: `${site}/stay/booking/${reference}`,
+      metadata: { hotel: hotel.name, room: room.name, nights, rooms: input.rooms, guest: input.fullName },
+    });
+    return Response.json({ ok: true, url: authorizationUrl, reference });
+  } catch {
+    await db.from('wedding_bookings').update({ status: 'failed', payment_note: 'Could not start Paystack checkout.', updated_at: new Date().toISOString() }).eq('reference', reference);
+    return Response.json({ error: 'We could not start the payment. Please try again in a moment.' }, { status: 502 });
+  }
+}
