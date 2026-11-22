@@ -142,7 +142,7 @@ export default function RsvpForm({ guest }: Props) {
 
     setSending(true);
     try {
-      const res = await fetch('/api/rsvp/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch('/api/rsvp/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(25000) });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         setResult({ ...(data as SubmitResult), email: checked.value.email });
@@ -157,7 +157,7 @@ export default function RsvpForm({ guest }: Props) {
       setError(data.error || 'Something went wrong. Please try again.');
       focusField(data.field);
     } catch {
-      setError('We could not reach the server. Please check your connection and try again.');
+      setError('This is taking too long or the connection dropped. Please check your connection and try again.');
     } finally {
       setSending(false);
     }

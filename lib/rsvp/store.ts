@@ -130,7 +130,7 @@ export async function createRsvp(sub: RsvpSubmission, opts: { guestId?: string |
   if (sub.stay) {
     const est = estimateStay(sub.stay.roomType, sub.stay.units);
     if (!est) throw new RsvpError('unavailable', 'Unknown accommodation type.');
-    const left = (await roomsLeft(sub.stay.roomType).catch(() => ({} as Record<string, number>)))[sub.stay.roomType];
+    const left = (await roomsLeft(sub.stay.roomType, { fresh: true }).catch(() => ({} as Record<string, number>)))[sub.stay.roomType];
     if (left !== undefined && left < sub.stay.units) {
       throw new RsvpError('stay_unavailable', left === 0 ? `Sorry, ${est.name} is fully reserved.` : `Only ${left} ${est.name} unit${left === 1 ? ' is' : 's are'} left. Please request fewer units.`);
     }

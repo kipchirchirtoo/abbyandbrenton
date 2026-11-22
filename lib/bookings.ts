@@ -53,23 +53,49 @@ export function findRoom(hotelId: string, roomId: string): { hotel: Hotel; room:
  * (paid, under review, or pending for less than 30 minutes). Counted across the whole event, which is deliberately cautious.
  * If the database cannot be reached, falls back to units minus offline reservations.
  */
-export async function roomsLeft(roomId?: string): Promise<Record<string, number>> {
-  const rooms = stay.hotels.flatMap((h) => h.rooms).filter((r) => !roomId || r.id === roomId);
+let leftCache: { at: number; ok: boolean; map: Record<string, number> } | null = null;
+
+async function computeLeft(): Promise<{ ok: boolean; map: Record<string, number> }> {
+  const rooms = stay.hotels.flatMap((h) => h.rooms);
   const held: Record<string, number> = {};
+  let ok = true;
   try {
-    const since = new Date(Date.now() - 30 * 60_000).toISOString();
-    const { data } = await getAdminClient()
-      .from('wedding_bookings')
-      .select('room_id, rooms, status, created_at')
-      .or(`status.in.(paid,review),and(status.eq.pending,created_at.gte.${since})`);
-    for (const b of (data ?? []) as { room_id: string; rooms: number }[]) held[b.room_id] = (held[b.room_id] ?? 0) + b.rooms;
-    // Accommodation requested through the RSVP form counts once an admin has confirmed it.
-    const { data: confirmed } = await getAdminClient().from('wedding_stay_requests').select('room_type, units').eq('status', 'confirmed');
-    for (const c of (confirmed ?? []) as { room_type: string; units: number }[]) held[c.room_type] = (held[c.room_type] ?? 0) + c.units;
+    const query = async () => {
+      const db = getAdminClient();
+      const since = new Date(Date.now() - 30 * 60_000).toISOString();
+      const { data, error } = await db
+        .from('wedding_bookings')
+        .select('room_id, rooms, status, created_at')
+        .or(`status.in.(paid,review),and(status.eq.pending,created_at.gte.${since})`);
+      if (error) throw error;
+      for (const b of (data ?? []) as { room_id: string; rooms: number }[]) held[b.room_id] = (held[b.room_id] ?? 0) + b.rooms;
+      // Accommodation requested through the RSVP form counts once an admin has confirmed it.
+      const { data: confirmed, error: e2 } = await db.from('wedding_stay_requests').select('room_type, units').eq('status', 'confirmed');
+      if (e2) throw e2;
+      for (const c of (confirmed ?? []) as { room_type: string; units: number }[]) held[c.room_type] = (held[c.room_type] ?? 0) + c.units;
+    };
+    await Promise.race([query(), new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500))]);
   } catch {
-    /* fall back to offline numbers */
+    ok = false; // fall back to the offline numbers
+    for (const k of Object.keys(held)) delete held[k];
   }
-  return Object.fromEntries(rooms.map((r) => [r.id, Math.max(0, (r.units ?? 99) - (r.reserved ?? 0) - (held[r.id] ?? 0))]));
+  return { ok, map: Object.fromEntries(rooms.map((r) => [r.id, Math.max(0, (r.units ?? 99) - (r.reserved ?? 0) - (held[r.id] ?? 0))])) };
+}
+
+/**
+ * Units still free per room category: total units, minus those reserved offline, minus rooms held by website bookings
+ * (paid, under review, or pending for less than 30 minutes) and confirmed accommodation requests. Counted across the
+ * whole event, which is deliberately cautious. Pages use a short-lived cached answer (and a failed lookup is remembered
+ * briefly) so they stay fast; pass { fresh: true } where it must be exact (taking a booking or a request).
+ */
+export async function roomsLeft(roomId?: string, opts: { fresh?: boolean } = {}): Promise<Record<string, number>> {
+  const now = Date.now();
+  if (opts.fresh || !leftCache || now - leftCache.at > (leftCache.ok ? 15_000 : 30_000)) {
+    const r = await computeLeft();
+    leftCache = { at: Date.now(), ...r };
+  }
+  const map = leftCache.map;
+  return roomId ? { [roomId]: map[roomId] } : map;
 }
 
 /** Short, unguessable, human-friendly reference. Doubles as the Paystack transaction reference. */

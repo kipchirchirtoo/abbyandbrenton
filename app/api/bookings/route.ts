@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Too many bookings from this connection. Please wait a few minutes.' }, { status: 429 });
   }
 
-  const left = (await roomsLeft(room.id))[room.id] ?? 0;
+  const left = (await roomsLeft(room.id, { fresh: true }))[room.id] ?? 0;
   if (left < input.rooms) {
     return Response.json(
       { error: left === 0 ? `Sorry, ${room.name} is fully booked.` : `Only ${left} ${room.name} unit${left === 1 ? ' is' : 's are'} left. Please choose fewer rooms.` },
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
   if (insertError) return Response.json({ error: 'We could not save your booking. Please try again.' }, { status: 500 });
 
   // Re-check after saving: if two guests raced for the last unit, the later one is cancelled instead of overbooking.
-  if (((await roomsLeft(room.id))[room.id] ?? 0) === 0) {
+  if (((await roomsLeft(room.id, { fresh: true }))[room.id] ?? 0) === 0) {
     const { data: mine } = await db.from('wedding_bookings').select('created_at').eq('reference', reference).maybeSingle();
     const { data: earlier } = await db
       .from('wedding_bookings')

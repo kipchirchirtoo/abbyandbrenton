@@ -14,6 +14,10 @@ export function getAdminClient(): SupabaseClient {
   if (!url || !key) {
     throw new Error('Supabase is not configured (SUPABASE_URL and SUPABASE_SECRET_KEY are required).');
   }
-  client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  client = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    // Hard time limit on every database call: an unreachable database fails fast instead of hanging the page.
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(8000) }) },
+  });
   return client;
 }

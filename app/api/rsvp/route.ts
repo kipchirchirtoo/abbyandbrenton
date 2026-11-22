@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   }
 
   // The deadline applies to this older endpoint too.
-  if (!(await getRsvpStatus()).open) return Response.json({ error: 'RSVPs are now closed.', closed: true }, { status: 403 });
+  if (!(await getRsvpStatus({ fresh: true })).open) return Response.json({ error: 'RSVPs are now closed.', closed: true }, { status: 403 });
 
   // Rate limit per IP, and separately per invitation, to blunt automated submissions.
   if (!rateLimit(`rsvp-ip:${clientIp(req)}`, 10, 10 * 60_000)) {

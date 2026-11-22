@@ -42,8 +42,10 @@ export async function POST(req: Request) {
   if (body && typeof body === 'object' && (body as Record<string, unknown>).website) return json({ error: 'Invalid request.' }, 400);
 
   // 1. The deadline, decided on the server from the server clock and the admin setting.
-  const status = await getRsvpStatus();
+  const status = await getRsvpStatus({ fresh: true });
   if (!status.open) return json({ error: 'RSVPs are now closed.', closed: true }, 403);
+  // If the database is known to be unreachable, say so straight away instead of making the guest wait.
+  if (!status.dbOk) return json({ error: 'RSVP is temporarily unavailable. Please try again in a few minutes.' }, 503);
 
   // 2. Personal-invitation visitors reply as themselves, within their invitation's guest limit.
   let guestId: string | null = null;
