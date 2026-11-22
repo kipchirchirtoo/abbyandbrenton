@@ -122,8 +122,8 @@ export const bridalStory = {
  *  - Photos live in /public/photos/villa/ as v-01.jpg ... v-82.jpg (numbers = the order of your original folder).
  *    `v(12)` below means "photo number 12". Move numbers between lists to re-organise the photos.
  *  - Replace the room NAMES, DESCRIPTIONS, PRICES and CAPACITY with the real details (everything marked SAMPLE / TODO).
- *  - Set `published: true` on every room you want guests to be able to book, and remove `sample: true`.
- * Prices are WHOLE KES per room per night. The server always recomputes the total; the browser never sets a price.
+ *  - `published: true` rooms can be booked. (`sample: true` is only for placeholder rooms and shows a SAMPLE tag.)
+ * Prices are WHOLE KES per UNIT for the stay (not per night). The server always recomputes the total; the browser never sets a price.
  * Rooms with `published: false` are hidden from guests and cannot be booked (their photos can still show in the gallery).
  */
 const v = (n: number) => `/photos/villa/v-${String(n).padStart(2, '0')}.jpg`;
@@ -132,11 +132,14 @@ export type Room = {
   id: string;
   name: string;
   description: string;
-  pricePerNight: number; // whole KES
-  capacity: number; // max guests per room
+  pricePerNight: number; // whole KES per UNIT (not per night; the field name is historic)
+  capacity?: number; // max guests per unit (optional: only shown / enforced when known)
   image?: string; // cover photo
   images?: string[]; // all photos of this room (shown in a gallery when clicked)
   amenities?: string[]; // what the room includes, shown as a list on the card
+  units?: number; // how many of this category exist for the wedding
+  reserved?: number; // already reserved offline (not through this website)
+  left?: number; // filled in by the server: units still free. Never edit.
   published: boolean;
   sample?: boolean;
 };
@@ -164,75 +167,70 @@ export const stay = {
   hotels: [
     {
       id: 'villa',
-      // TODO: replace with the real property name.
-      name: 'The Villa & Apartments',
+      name: 'Sultan Palace',
       area: 'Kikambala, Mtwapa',
-      description: 'A private villa with a pool and ocean views, plus apartments set in lush tropical gardens. (TODO: add the real description.)',
+      description: 'Villas, town houses and apartments at Sultan Palace, Kikambala.',
       mapQuery: 'Sultan Palace Kikambala Mtwapa Kenya',
       image: v(80),
       // The villa, its pool, gardens and the grounds.
       gallery: [80, 73, 76, 77, 74, 78, 65, 71, 40, 41, 48, 49, 50, 51, 53, 20, 22, 24].map(v),
       rooms: [
-        // The five Sultan Palace categories. Prices, capacities and amenities below are SAMPLES: replace with the real details.
+        // The five Sultan Palace categories with their real prices (KES per UNIT, not per night) and unit counts.
+        // Add `capacity: N` and `amenities: [...]` to a room when you have the real details: they are shown only when present.
         {
           id: 'villa',
           name: 'Villa',
-          description: 'Sample description. A private villa with canopy beds, a private pool and the ocean at the end of the garden.',
-          pricePerNight: 30000,
-          capacity: 8,
-          amenities: ['Private pool', 'Ocean view', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
+          description: 'Villa accommodation at Sultan Palace, Kikambala.',
+          pricePerNight: 50000,
+          units: 7,
+          reserved: 2,
           image: v(80),
           images: [80, 76, 73, 59, 64, 60, 72, 75, 67, 66, 79, 71, 78, 74, 77, 65, 57, 58, 62, 70, 68, 55, 61, 63, 56, 52, 54, 69].map(v),
-          published: false,
-          sample: true,
+          published: true,
         },
         {
           id: 'townhouse-3br',
           name: '3 Bedroom Town House',
-          description: 'Sample description. Two floors with three bedrooms, a private garden and a spacious living room.',
-          pricePerNight: 18000,
-          capacity: 6,
-          amenities: ['3 bedrooms', 'Private garden', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
+          description: 'Three-bedroom town house at Sultan Palace, Kikambala.',
+          pricePerNight: 20000,
+          units: 13,
+          reserved: 10,
           image: v(41),
           images: [41, 40, 39, 44, 47, 43, 42, 46, 45].map(v),
-          published: false,
-          sample: true,
+          published: true,
         },
         {
           id: 'apartment-3br',
           name: '3 Bedroom Apartment',
-          description: 'Sample description. Hand-carved wooden furniture, a balcony and a light-filled living area.',
-          pricePerNight: 15000,
-          capacity: 6,
-          amenities: ['3 bedrooms', 'Balcony', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
+          description: 'Three-bedroom apartment at Sultan Palace, Kikambala.',
+          pricePerNight: 18000,
+          units: 7,
+          reserved: 0,
           image: v(4),
           images: [4, 9, 10, 11, 12, 15, 18, 13, 17, 82, 14, 3, 5, 16, 2, 8, 1, 6, 7, 23].map(v),
-          published: false,
-          sample: true,
+          published: true,
         },
         {
           id: 'apartment-2br',
           name: '2 Bedroom Apartment',
-          description: 'Sample description. Fresh teal and white interiors with a balcony and a fully fitted kitchen.',
-          pricePerNight: 11000,
-          capacity: 4,
-          amenities: ['2 bedrooms', 'Balcony', 'Fully fitted kitchen', 'Air conditioning', 'Wi-Fi'],
+          description: 'Two-bedroom apartment at Sultan Palace, Kikambala.',
+          pricePerNight: 12000,
+          units: 17,
+          reserved: 0,
           image: v(27),
           images: [27, 28, 29, 33, 37, 30, 32, 36, 21, 31, 35, 26, 34, 38].map(v),
-          published: false,
-          sample: true,
+          published: true,
         },
         {
           id: 'apartment-1br',
           name: '1 Bedroom Apartment',
-          description: 'Sample description. A cosy apartment for two, with a balcony and a kitchenette.',
-          pricePerNight: 7000,
-          capacity: 2,
-          amenities: ['1 bedroom', 'Balcony', 'Kitchenette', 'Air conditioning', 'Wi-Fi'],
+          description: 'One-bedroom apartment at Sultan Palace, Kikambala.',
+          pricePerNight: 6000,
+          units: 9,
+          reserved: 0,
           image: v(26),
           images: [26, 34, 38, 21, 31, 35].map(v),
-          published: false,
-          sample: true,
+          published: true,
         },
       ],
     },

@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const { data, error } = await getAdminClient().from('wedding_bookings').select('*').order('created_at', { ascending: false });
   if (error) return Response.json({ error: 'Export failed.' }, { status: 500 });
 
-  const head = ['Reference', 'Status', 'Booked at', 'Guest', 'Email', 'Phone', 'Hotel', 'Room', 'Rooms', 'Check-in', 'Check-out', 'Nights', 'Guests', 'Currency', 'Price per night', 'Total', 'Paid at', 'Notes', 'Payment note'];
+  const head = ['Reference', 'Status', 'Booked at', 'Guest', 'Email', 'Phone', 'Hotel', 'Room', 'Rooms', 'Check-in', 'Check-out', 'Nights', 'Guests', 'Currency', 'Price per unit', 'Total', 'Paid at', 'Notes', 'Payment note'];
   const lines = [head.map(csvCell).join(',')];
   for (const b of data ?? []) {
     lines.push(

@@ -15,10 +15,10 @@ export function renderInvitationEmail(opts: { name: string; link: string; guestL
   const subject = 'A special invitation from Abigael & Brenton ❤️';
 
   const html = `<!doctype html>
-<html><body style="margin:0;background:#faf6ef;font-family:Georgia,'Times New Roman',serif;color:#3b3a35">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf6ef;padding:32px 12px"><tr><td align="center">
+<html><body style="margin:0;background:#f8ede4;font-family:Georgia,'Times New Roman',serif;color:#3b3a35">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8ede4;padding:32px 12px"><tr><td align="center">
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#fffdf8;border:1px solid #eadfc9">
-<tr><td align="center" style="background:#5f7052;padding:36px 24px">
+<tr><td align="center" style="background:#5c1a27;padding:36px 24px">
   <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#e8e1cf">Wedding invitation</div>
   <div style="font-size:38px;font-style:italic;color:#f1dfae;margin-top:10px">Abigael &amp; Brenton</div>
 </td></tr>
@@ -28,7 +28,7 @@ export function renderInvitationEmail(opts: { name: string; link: string; guestL
   <p style="font-size:18px;margin:0">Friday, 15 January 2027</p>
   <p style="font-size:16px;color:#7d7a70;margin:4px 0 24px">Sultan Palace · Kikambala, Mtwapa</p>
   <p style="font-size:15px;line-height:1.6;margin:0 0 24px">${esc(plusLine)}<br>Open your private invitation to view the details and confirm your attendance.</p>
-  <a href="${link}" style="display:inline-block;background:#5f7052;color:#ffffff;text-decoration:none;padding:14px 34px;font-size:13px;letter-spacing:3px;text-transform:uppercase">Open my invitation</a>
+  <a href="${link}" style="display:inline-block;background:#5c1a27;color:#ffffff;text-decoration:none;padding:14px 34px;font-size:13px;letter-spacing:3px;text-transform:uppercase">Open my invitation</a>
   <p style="font-size:13px;color:#7d7a70;margin:28px 0 0">Kindly reply by 30 December 2026.</p>
   <p style="font-size:12px;color:#9a968a;margin:20px 0 0;line-height:1.5">Your invitation link is personal. Please do not forward it.<br>If the button doesn't work, copy this link into your browser:<br><span style="word-break:break-all">${link}</span></p>
 </td></tr>

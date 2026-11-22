@@ -48,6 +48,30 @@ export function findRoom(hotelId: string, roomId: string): { hotel: Hotel; room:
   return hotel && room ? { hotel, room } : null;
 }
 
+/**
+ * Units still free per room category: total units, minus those reserved offline, minus rooms held by website bookings
+ * (paid, under review, or pending for less than 30 minutes). Counted across the whole event, which is deliberately cautious.
+ * If the database cannot be reached, falls back to units minus offline reservations.
+ */
+export async function roomsLeft(roomId?: string): Promise<Record<string, number>> {
+  const rooms = stay.hotels.flatMap((h) => h.rooms).filter((r) => !roomId || r.id === roomId);
+  const held: Record<string, number> = {};
+  try {
+    const since = new Date(Date.now() - 30 * 60_000).toISOString();
+    const { data } = await getAdminClient()
+      .from('wedding_bookings')
+      .select('room_id, rooms, status, created_at')
+      .or(`status.in.(paid,review),and(status.eq.pending,created_at.gte.${since})`);
+    for (const b of (data ?? []) as { room_id: string; rooms: number }[]) held[b.room_id] = (held[b.room_id] ?? 0) + b.rooms;
+    // Accommodation requested through the RSVP form counts once an admin has confirmed it.
+    const { data: confirmed } = await getAdminClient().from('wedding_stay_requests').select('room_type, units').eq('status', 'confirmed');
+    for (const c of (confirmed ?? []) as { room_type: string; units: number }[]) held[c.room_type] = (held[c.room_type] ?? 0) + c.units;
+  } catch {
+    /* fall back to offline numbers */
+  }
+  return Object.fromEntries(rooms.map((r) => [r.id, Math.max(0, (r.units ?? 99) - (r.reserved ?? 0) - (held[r.id] ?? 0))]));
+}
+
 /** Short, unguessable, human-friendly reference. Doubles as the Paystack transaction reference. */
 export const newReference = () => `AB-${randomBytes(6).toString('hex').toUpperCase()}`;
 
@@ -105,10 +129,11 @@ export function parseBooking(
   }
   if (!Number.isInteger(input.rooms) || input.rooms < 1 || input.rooms > 5) return { error: 'You can book between 1 and 5 rooms online.' };
   if (!Number.isInteger(input.guests) || input.guests < 1) return { error: 'Please enter the number of guests.' };
-  if (input.guests > input.rooms * found.room.capacity) {
+  if (found.room.capacity && input.guests > input.rooms * found.room.capacity) {
     return { error: `That room sleeps up to ${found.room.capacity} guests. Please add another room.` };
   }
-  const total = found.room.pricePerNight * nights * input.rooms;
+  // The stated price is per unit for the stay, not per night.
+  const total = found.room.pricePerNight * input.rooms;
   return { input, hotel: found.hotel, room: found.room, nights, total };
 }
 

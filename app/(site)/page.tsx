@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import HeroSlideshow from '@/components/site/HeroSlideshow';
 import TravelScene from '@/components/site/TravelScene';
+import EventIcon from '@/components/site/EventIcon';
 import Countdown, { AddToCalendar } from '@/components/site/Countdown';
 import GalleryPreview from '@/components/site/GalleryPreview';
 import PrivateAccess from '@/components/PrivateAccess';
+import RsvpCountdown from '@/components/rsvp/RsvpCountdown';
+import { getRsvpStatus } from '@/lib/rsvp/state';
 import { getSiteAccess } from '@/lib/guest-session';
 import { couple, venue, weddingDay } from '@/lib/content';
 
@@ -13,6 +16,7 @@ export default async function HomePage() {
   const access = await getSiteAccess();
   if (!access.allowed) return <PrivateAccess reason={access.reason} />;
   const guest = access.guest;
+  const rsvp = await getRsvpStatus();
   const mapQ = encodeURIComponent(venue.mapQuery).replace(/%20/g, '+');
 
   return (
@@ -61,8 +65,8 @@ export default async function HomePage() {
         <div className="timeline compact">
           {weddingDay.events.map((e) => (
             <div className="t" key={e.time + e.title}>
-              <time>{e.time}</time>
-              <div><h3>{e.title}</h3><p>{e.text}</p></div>
+              <EventIcon title={e.title} />
+              <div><time>{e.time}</time><h3>{e.title}</h3><p>{e.text}</p></div>
             </div>
           ))}
         </div>
@@ -93,9 +97,18 @@ export default async function HomePage() {
       </section>
 
       <section className="reveal cta-band">
-        <p className="eyebrow">Kindly reply by 30 December 2026</p>
-        <h2>We can’t wait to celebrate with you</h2>
-        <Link className="btn solid light" href="/rsvp">RSVP now</Link>
+        {rsvp.open ? (
+          <>
+            <RsvpCountdown closesAt={rsvp.closesAt} serverNow={rsvp.serverNow} mode={rsvp.mode} compact />
+            <h2>We can’t wait to celebrate with you</h2>
+            <Link className="btn solid light" href="/rsvp">RSVP now</Link>
+          </>
+        ) : (
+          <>
+            <p className="eyebrow">RSVPs are now closed</p>
+            <h2>Thank you, we look forward to celebrating with our confirmed guests</h2>
+          </>
+        )}
       </section>
     </>
   );

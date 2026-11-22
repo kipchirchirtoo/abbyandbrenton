@@ -3,6 +3,7 @@ import { getInvitation, parseRsvpBody } from '@/lib/invitations/validation';
 import { getSessionToken } from '@/lib/guest-session';
 import { hashInvitationToken, isWellFormedToken } from '@/lib/invitations/tokens';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
+import { getRsvpStatus } from '@/lib/rsvp/state';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
   if (origin && host && new URL(origin).host !== host) {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  // The deadline applies to this older endpoint too.
+  if (!(await getRsvpStatus()).open) return Response.json({ error: 'RSVPs are now closed.', closed: true }, { status: 403 });
 
   // Rate limit per IP, and separately per invitation, to blunt automated submissions.
   if (!rateLimit(`rsvp-ip:${clientIp(req)}`, 10, 10 * 60_000)) {

@@ -25,10 +25,10 @@ export async function sendBookingConfirmation(b: BookingRow): Promise<void> {
     ['Guests', String(b.guests)],
     ['Total paid', total],
   ];
-  const html = `<!doctype html><html><body style="margin:0;background:#faf6ef;font-family:Georgia,serif;color:#3b3a35">
+  const html = `<!doctype html><html><body style="margin:0;background:#f8ede4;font-family:Georgia,serif;color:#3b3a35">
 <table role="presentation" width="100%" style="padding:28px 12px"><tr><td align="center">
 <table role="presentation" width="560" style="max-width:560px;width:100%;background:#fffdf8;border:1px solid #eadfc9">
-<tr><td align="center" style="background:#5f7052;padding:28px"><div style="font-size:32px;font-style:italic;color:#f1dfae">Abigael &amp; Brenton</div>
+<tr><td align="center" style="background:#5c1a27;padding:28px"><div style="font-size:32px;font-style:italic;color:#f1dfae">Abigael &amp; Brenton</div>
 <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#e8e1cf;margin-top:6px">Room booking confirmed</div></td></tr>
 <tr><td style="padding:30px 32px">
 <p style="font-size:17px;margin:0 0 18px">Dear ${esc(b.full_name)}, thank you. Your payment was received and your room is booked.</p>

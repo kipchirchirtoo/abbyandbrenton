@@ -1,0 +1,183 @@
+/* ============================================================================
+   RSVP system: countdown, closure screen, form, personalised invitation card, admin dashboards and scanner.
+   Burgundy · blush · antique gold, to match the invitation.
+   ========================================================================== */
+:root{--burgundy:#5c1a27;--burgundy-d:#3d0f1a;--blush-bg:#faede4;--gold:#c9a65b}
+.no-print{}
+.print-only{display:none}
+.hp-field{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.center{text-align:center}
+
+/* ---------- countdown ---------- */
+.rsvp-count{max-width:640px;margin:0 auto}
+.rsvp-count .lead{margin-top:18px}
+.rc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px auto 0;max-width:520px}
+.rc-cell{background:linear-gradient(160deg,var(--burgundy),var(--burgundy-d));border-radius:12px;padding:16px 6px 12px;color:#f6e8de;box-shadow:0 10px 24px rgba(92,26,39,.28),inset 0 0 0 1px rgba(201,166,91,.45);position:relative;overflow:hidden}
+.rc-cell::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.28)}
+.rc-num{display:block;font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(2rem,8vw,3rem);line-height:1;font-variant-numeric:lining-nums tabular-nums;color:#f1dfae;animation:rcFlip .55s cubic-bezier(.2,.8,.2,1)}
+.rc-cell span{display:block;margin-top:8px;font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;color:#e5c8c3}
+@keyframes rcFlip{from{transform:translateY(-38%) rotateX(70deg);opacity:0}to{transform:none;opacity:1}}
+.rsvp-count.compact .rc-cell{padding:12px 4px 10px}
+.cta-band .rc-cell{background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(241,223,174,.5);backdrop-filter:blur(2px)}
+.cta-band .rsvp-count .lead{color:#f3e1d8}
+.cta-band .rsvp-count{margin-bottom:34px}
+
+/* ---------- closed screen ---------- */
+.rsvp-closed{max-width:600px;margin:0 auto;text-align:center;padding:30px 12px;animation:fadeUp .9s both}
+.rsvp-closed h2{font-size:clamp(2rem,6vw,2.8rem);margin:18px 0 14px;color:var(--burgundy)}
+.rsvp-closed .lead{margin:0 auto 12px}
+.rsvp-closed .btn{margin-top:18px}
+.rc-seal{position:relative;width:96px;height:96px;margin:0 auto;animation:sealIn 1.2s cubic-bezier(.2,.8,.2,1) both}
+.rc-seal svg{display:block;animation:spinSlow 40s linear infinite}
+.rc-petal{position:absolute;width:8px;height:8px;border-radius:50% 0 50% 50%;background:#d9a2a8;opacity:0;animation:petalFall 5s ease-in infinite}
+.rc-petal.p1{left:8%;top:-6px;animation-delay:0s}.rc-petal.p2{left:46%;top:-10px;animation-delay:1.4s;background:#e6cb86}.rc-petal.p3{left:80%;top:-4px;animation-delay:2.6s}.rc-petal.p4{left:28%;top:-8px;animation-delay:3.7s;background:#c5898e}
+@keyframes petalFall{0%{transform:translateY(0) rotate(0);opacity:0}15%{opacity:.9}100%{transform:translateY(130px) rotate(200deg);opacity:0}}
+@keyframes sealIn{from{transform:scale(.6) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ---------- RSVP form ---------- */
+.rsvp-form{max-width:640px}
+.rf-section{border:0;padding:0;margin:0 0 26px;min-width:0}
+.rf-section legend{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--burgundy);padding:0 0 4px;margin-bottom:4px;border-bottom:1px solid #ecd2c4;width:100%}
+.rf-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rf-two.tight{gap:8px;margin-top:8px}
+@media (max-width:560px){.rf-two{grid-template-columns:1fr}}
+.rf-phone{display:grid;grid-template-columns:minmax(120px,.9fr) 1.4fr;gap:8px}
+.rf-hint{font-size:.82rem;color:var(--muted);margin:8px 0}
+.rf-hint.warn{color:#a23b32}
+.rf-hint.center{text-align:center;margin-top:14px}
+.rsvp .opt{text-transform:none;letter-spacing:0;font-style:italic;color:#a08a80;font-size:.78rem}
+.rsvp input.invalid,.rsvp select.invalid,.rsvp textarea.invalid,.pill-choice.invalid{border-color:#a23b32!important;box-shadow:0 0 0 2px rgba(162,59,50,.2)}
+.pill-choice{display:flex;flex-direction:column;gap:12px;margin-top:8px;border-radius:99px;outline:0}
+.pill-choice label{margin:0!important;display:block;cursor:pointer;border-radius:99px;padding:15px 22px!important;border:1px solid var(--burgundy);color:var(--burgundy)!important;text-align:center;letter-spacing:.14em!important;text-transform:uppercase;font-size:.78rem!important;transition:background .25s,color .25s,box-shadow .25s}
+.pill-choice label.on{background:var(--burgundy);color:#f6e8de!important;box-shadow:0 6px 14px rgba(92,26,39,.28)}
+.pill-choice input{position:absolute;opacity:0;pointer-events:none;width:1px!important;height:1px}
+.pill-choice label:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+
+.party{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px}
+.party-row{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:start;background:#fff;border:1px solid #ecd2c4;border-radius:10px;padding:12px}
+.party-row.primary{background:#fdf5ee}
+.party-num{width:30px;height:30px;border-radius:50%;background:var(--burgundy);color:#f6e8de;display:grid;place-items:center;font-size:.8rem;margin-top:2px}
+.party-fields b{display:block;font-weight:500}.party-fields small{color:var(--muted)}
+.party-remove{border:0;background:none;color:#a23b32;font-size:1.6rem;line-height:1;cursor:pointer;padding:2px 6px}
+.add-guest{margin-top:14px;width:100%}
+.party-total{margin-top:16px;padding:12px 16px;border-radius:99px;background:#fdf5ee;border:1px dashed var(--gold);text-align:center;color:var(--burgundy)}
+.party-total b{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:500;margin-right:4px}
+.stay-box{margin-top:12px;padding:16px;border:1px solid #ecd2c4;border-radius:10px;background:#fffdfb}
+.stay-box>input{margin-bottom:8px}
+.stay-estimate{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--burgundy);color:#f6e8de;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline}
+.stay-estimate b{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:500;color:#f1dfae}
+.stay-estimate small{grid-column:1/-1;color:#e5c8c3;font-size:.76rem;line-height:1.4}
+.rf-submit{width:100%;margin-top:6px}
+.rsvp .form-error{background:#fbeceb;border:1px solid #efc4c0;border-radius:8px;padding:12px 14px}
+.resend{margin-top:10px}.resend .linklike{font-size:.95rem}
+.form-error-inline{color:#a23b32;margin:6px 0 0}
+.notice.ok{color:#2f6b34}.notice.warn{color:#8a5a1d}
+.rsvp-success{max-width:720px;margin:0 auto}
+.rsvp-success .script{font-size:3rem}
+
+/* ---------- personalised invitation card ---------- */
+.standalone{min-height:100vh;padding:48px 16px 70px;text-align:center;background:radial-gradient(ellipse at 50% 0,#fff4ec,var(--blush-bg) 55%,#f1d9cd)}
+.standalone .eyebrow{margin-bottom:18px}
+.inv-wrap{max-width:430px;margin:26px auto 0}
+.inv-card{position:relative;overflow:hidden;background:linear-gradient(#fffaf5,#f9e9de);border-radius:6px;padding:34px 26px 28px;text-align:center;color:var(--burgundy);
+  box-shadow:0 22px 50px rgba(92,26,39,.22),0 2px 6px rgba(92,26,39,.12);animation:invIn 1s cubic-bezier(.2,.8,.2,1) both;font-variant-numeric:lining-nums}
+@keyframes invIn{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:none}}
+.inv-frame{position:absolute;inset:10px;border:1px solid var(--gold);border-radius:3px;pointer-events:none}
+.inv-frame::after{content:"";position:absolute;inset:4px;border:1px solid rgba(201,166,91,.45);border-radius:2px}
+.inv-shimmer{position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-14deg);animation:invShimmer 5.5s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes invShimmer{0%{left:-80px}45%,100%{left:120%}}
+.inv-ghost{position:absolute;right:20px;top:72px;font-family:'Cormorant Garamond',serif;font-size:4.4rem;line-height:.84;color:rgba(176,137,120,.13);text-align:right;pointer-events:none}
+.inv-head,.inv-guest,.inv-when,.inv-qr,.inv-foot,.inv-stay{position:relative}
+.inv-small{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:#7d4e48;margin:0}
+.inv-photo{width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:center 30%;margin:16px auto 6px;display:block;border:3px solid #fffaf5;box-shadow:0 0 0 1.5px var(--gold),0 8px 18px rgba(92,26,39,.25)}
+.inv-names{font-family:'Great Vibes',cursive;font-weight:400;font-size:clamp(2.5rem,11vw,3.3rem);line-height:1.1;color:var(--burgundy);margin:4px 0 8px}
+.inv-names em{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#8f6b56}
+.inv-guest{margin-top:22px;padding-top:18px;border-top:1px solid rgba(201,166,91,.55)}
+.inv-label{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:#8f6b56;margin:0 0 4px}
+.inv-primary{font-family:'Cormorant Garamond',serif;font-size:1.9rem;line-height:1.15;margin:0;font-weight:500}
+.inv-companions{list-style:none;margin:10px 0 0;padding:0;font-size:1.05rem;color:#5a3a3d}
+.inv-companions small{color:#8f6b56;font-size:.78rem}
+.inv-count{margin-top:16px;display:grid;gap:6px;justify-items:center}
+.inv-badge{display:inline-block;background:var(--burgundy);color:#f6e8de;border-radius:99px;padding:5px 16px;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase}
+.inv-count p{margin:0;font-family:'Cormorant Garamond',serif;font-size:1.3rem}
+.inv-count small{font-family:'Jost',sans-serif;font-size:.78rem;color:#8f6b56}
+.inv-when{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;padding:16px 0;border-top:1px solid rgba(201,166,91,.55);border-bottom:1px solid rgba(201,166,91,.55);text-align:center}
+.inv-when p{margin:0;font-size:.98rem;line-height:1.4}
+.inv-when .inv-label{margin-bottom:6px}
+.inv-sub{font-size:.76rem!important;color:#8f6b56;letter-spacing:.05em}
+.inv-qr{margin-top:20px}
+.inv-qr img{display:block;margin:0 auto;border-radius:10px;border:1px solid #ecd2c4;background:#fff;padding:6px;box-shadow:0 6px 16px rgba(92,26,39,.14);animation:qrPulse 3.2s ease-in-out infinite}
+@keyframes qrPulse{50%{box-shadow:0 6px 22px rgba(201,166,91,.55)}}
+.inv-ref{font-family:'Cormorant Garamond',serif;font-size:1.5rem;letter-spacing:.14em;margin:10px 0 0!important}
+.inv-stay{margin:18px 0 0;font-size:.85rem;color:#6d4a4a;background:#fdf1e8;border-radius:8px;padding:8px 12px}
+.inv-foot{margin-top:20px}
+.inv-foot p{margin:0;font-size:.86rem;color:#7d5a5a;line-height:1.6}
+.inv-sign{font-family:'Great Vibes',cursive;font-size:1.6rem!important;color:var(--burgundy)!important;margin-top:8px!important}
+.inv-card.capturing,.inv-card.capturing *{animation:none!important}
+.inv-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+.inv-actions .btn{margin-top:0;flex:1 1 150px}
+.inv-wrap .notice{text-align:center}
+@media print{
+  body.printing-card *{visibility:hidden!important}
+  body.printing-card #invitation-card,body.printing-card #invitation-card *{visibility:visible!important}
+  body.printing-card #invitation-card{position:absolute;left:50%;top:10mm;transform:translateX(-50%);width:130mm;box-shadow:none;animation:none}
+  .no-print{display:none!important}
+  .print-only{display:block}
+  @page{margin:10mm}
+}
+
+/* ---------- admin: dashboard, scanner, print list ---------- */
+.mode-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.mode-row .btn{margin-top:0}
+.admin h2{margin-top:22px}
+.progress{height:10px;border-radius:99px;background:#ecd2c4;overflow:hidden;margin:-8px 0 24px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--burgundy),var(--gold));transition:width .5s}
+.head-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.head-tools input[type=search]{min-width:230px}
+.head-tools .btn{margin-top:0}
+.detail-row td{background:#fdf6f0}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width:760px){.detail-grid{grid-template-columns:1fr}}
+.detail-grid h3{font-size:1.15rem;margin-bottom:6px}
+.plain{list-style:none;margin:0;padding:0}
+.plain li{padding:4px 0}
+.scanner{max-width:560px;margin:0 auto}
+.scan-view{position:relative;aspect-ratio:1;max-height:62vh;margin:0 auto;border-radius:12px;overflow:hidden;background:#1f0b10;display:grid;place-items:center}
+.scan-view video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.scan-view[data-active=true] video{display:block}
+.scan-view p{color:#e5c8c3;padding:20px}
+.scan-frame{position:absolute;inset:18%;border:2px solid var(--gold);border-radius:14px;box-shadow:0 0 0 999px rgba(20,5,8,.38);animation:scanPulse 1.6s ease-in-out infinite}
+@keyframes scanPulse{50%{border-color:#fff}}
+.scan-controls{display:flex;justify-content:center;margin-top:12px}
+.scan-controls .btn{margin-top:0;width:100%}
+.search-row{display:flex;gap:8px}
+.search-row .btn{margin-top:0}
+.scan-banner{padding:14px 16px;border-radius:10px;font-weight:500;margin-bottom:16px;text-align:center}
+.scan-banner.ok{background:#dfeedd;color:#2f6b34}.scan-banner.warn{background:#fbefd5;color:#8a5a1d}.scan-banner.error{background:#fbeceb;color:#a23b32}
+.result-list .result{width:100%;text-align:left;background:#fff;border:1px solid #ecd2c4;border-radius:10px;padding:12px 14px;margin:6px 0;cursor:pointer;font:inherit;display:grid;gap:2px}
+.result-list .result span{font-size:.8rem;color:var(--muted)}
+.guest-panel .people li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #efe6d3}
+.guest-panel .people li.in{opacity:.75}
+.guest-panel .people label{display:flex;gap:10px;align-items:center;margin:0;text-transform:none;letter-spacing:0;font-size:1rem;color:var(--ink)}
+.guest-panel .people input{width:22px;height:22px;padding:0}
+.in-at{color:#2f6b34}
+.already{background:#fbefd5;color:#8a5a1d;text-align:center;font-size:1.3rem;font-weight:500;border-radius:10px;padding:16px;margin:14px 0 0}
+.btn.big{width:100%;margin-top:16px;padding:18px;font-size:1rem;letter-spacing:.2em}
+.print-list table td.box{font-size:1.3rem;text-align:center}
+.print-list tr.group-start td{border-top:2px solid #b79482}
+@media print{
+  .admin-bar,.no-print{display:none!important}
+  .admin{background:#fff}
+  .print-only{display:block}
+  .print-list table{font-size:11pt}
+}
+
+/* The site-wide `section` and `footer` rules must not leak into the card. */
+.inv-card section,.inv-card header,.inv-card footer{padding:0;max-width:none;margin:0;background:none;color:inherit;text-align:center}
+.inv-card section.inv-guest{margin-top:22px;padding-top:18px}
+.inv-card section.inv-when{margin-top:20px;padding:16px 0}
+.inv-card section.inv-qr{margin-top:20px}
+.inv-card footer.inv-foot{margin-top:20px}
+.inv-card .inv-foot p{color:#7d5a5a}

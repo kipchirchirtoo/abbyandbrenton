@@ -19,7 +19,7 @@ export default function AdminLogin() {
       body: JSON.stringify({ password }),
     });
     if (res.ok) {
-      router.replace('/admin/guests');
+      router.replace('/admin/rsvp');
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));

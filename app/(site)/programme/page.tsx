@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PageHero from '@/components/site/PageHero';
+import EventIcon from '@/components/site/EventIcon';
 import PrivateAccess from '@/components/PrivateAccess';
 import { getSiteAccess } from '@/lib/guest-session';
 import { weddingDay } from '@/lib/content';
@@ -22,8 +23,8 @@ export default async function Programme() {
         <div className="timeline">
           {weddingDay.events.map((e, i) => (
             <div className="t" key={e.time + e.title} style={{ animationDelay: `${i * 90}ms` }}>
-              <time>{e.time}</time>
-              <div><h3>{e.title}</h3><p>{e.text}</p></div>
+              <EventIcon title={e.title} />
+              <div><time>{e.time}</time><h3>{e.title}</h3><p>{e.text}</p></div>
             </div>
           ))}
         </div>

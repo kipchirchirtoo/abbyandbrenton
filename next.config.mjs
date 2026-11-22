@@ -13,6 +13,8 @@ const nextConfig = {
   async headers() {
     return [
       { source: '/invite/:path*', headers: privateHeaders },
+      { source: '/invitation/:path*', headers: privateHeaders },
+      { source: '/v/:path*', headers: privateHeaders },
       { source: '/admin/:path*', headers: [...privateHeaders, { key: 'X-Frame-Options', value: 'DENY' }] },
       { source: '/api/:path*', headers: [{ key: 'Cache-Control', value: 'no-store' }] },
       {
@@ -22,6 +24,8 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      // The wedding-day scanner needs the camera, on the admin screens only. (Later rules win for the same header.)
+      { source: '/admin/:path*', headers: [{ key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=()' }] },
     ];
   },
 };

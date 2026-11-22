@@ -1,7 +1,7 @@
 import { getAdminClient } from '@/lib/supabase/admin';
 import { getSessionToken, getSiteAccess } from '@/lib/guest-session';
 import { getInvitation } from '@/lib/invitations/validation';
-import { newReference, parseBooking } from '@/lib/bookings';
+import { newReference, parseBooking, roomsLeft } from '@/lib/bookings';
 import { initializeTransaction, paystackConfigured } from '@/lib/paystack';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 
@@ -40,6 +40,14 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Too many bookings from this connection. Please wait a few minutes.' }, { status: 429 });
   }
 
+  const left = (await roomsLeft(room.id))[room.id] ?? 0;
+  if (left < input.rooms) {
+    return Response.json(
+      { error: left === 0 ? `Sorry, ${room.name} is fully booked.` : `Only ${left} ${room.name} unit${left === 1 ? ' is' : 's are'} left. Please choose fewer rooms.` },
+      { status: 409 },
+    );
+  }
+
   let guestId: string | null = null;
   const token = await getSessionToken();
   if (token) {
@@ -70,6 +78,23 @@ export async function POST(req: Request) {
     total,
   });
   if (insertError) return Response.json({ error: 'We could not save your booking. Please try again.' }, { status: 500 });
+
+  // Re-check after saving: if two guests raced for the last unit, the later one is cancelled instead of overbooking.
+  if (((await roomsLeft(room.id))[room.id] ?? 0) === 0) {
+    const { data: mine } = await db.from('wedding_bookings').select('created_at').eq('reference', reference).maybeSingle();
+    const { data: earlier } = await db
+      .from('wedding_bookings')
+      .select('rooms')
+      .eq('room_id', room.id)
+      .or('status.in.(paid,review),status.eq.pending')
+      .lt('created_at', (mine as { created_at: string } | null)?.created_at ?? new Date().toISOString());
+    const before = (earlier ?? []).reduce((n: number, b: { rooms: number }) => n + b.rooms, 0);
+    const cap = (room.units ?? 99) - (room.reserved ?? 0);
+    if (before + input.rooms > cap) {
+      await db.from('wedding_bookings').update({ status: 'cancelled', payment_note: 'Sold out before payment started.', updated_at: new Date().toISOString() }).eq('reference', reference);
+      return Response.json({ error: `Sorry, ${room.name} has just sold out.` }, { status: 409 });
+    }
+  }
 
   try {
     const site = process.env.NEXT_PUBLIC_SITE_URL!.replace(/\/$/, '');

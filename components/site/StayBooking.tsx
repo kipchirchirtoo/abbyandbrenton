@@ -47,7 +47,7 @@ export default function StayBooking(p: Props) {
   const [hotelId, roomId] = sel.split('|');
   const chosen = flat.find((x) => x.hotel.id === hotelId && x.room.id === roomId) ?? flat[0];
   const nights = Math.max(0, dayNumber(checkOut) - dayNumber(checkIn));
-  const total = nights > 0 ? chosen.room.pricePerNight * nights * rooms : 0;
+  const total = nights > 0 ? chosen.room.pricePerNight * rooms : 0;
 
   function choose(hid: string, rid: string) {
     setSel(`${hid}|${rid}`);
@@ -112,10 +112,10 @@ export default function StayBooking(p: Props) {
                       {r.amenities.map((a) => <li key={a}>{a}</li>)}
                     </ul>
                   )}
-                  <p className="room-meta">Sleeps up to {r.capacity}</p>
-                  <p className="room-price"><b>{kes(r.pricePerNight)}</b> <small>per room / night</small></p>
-                  <button type="button" className="btn solid" onClick={() => choose(h.id, r.id)}>
-                    {sel === `${h.id}|${r.id}` ? 'Selected ✓' : 'Select this room'}
+                  <p className="room-meta">{[r.capacity ? `Sleeps up to ${r.capacity}` : '', r.left === undefined ? '' : r.left === 0 ? 'Sold out' : r.left <= 5 ? `Only ${r.left} left` : `${r.left} available`].filter(Boolean).join(' · ')}</p>
+                  <p className="room-price"><b>{kes(r.pricePerNight)}</b> <small>per unit (not per night)</small></p>
+                  <button type="button" className="btn solid" disabled={r.left === 0} onClick={() => choose(h.id, r.id)}>
+                    {r.left === 0 ? 'Sold out' : sel === `${h.id}|${r.id}` ? 'Selected ✓' : 'Select this room'}
                   </button>
                 </div>
               </article>
@@ -137,11 +137,11 @@ export default function StayBooking(p: Props) {
         <div className="two">
           <div>
             <label htmlFor="brooms">Rooms</label>
-            <select id="brooms" value={rooms} onChange={(e) => setRooms(Number(e.target.value))}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}</select>
+            <select id="brooms" value={rooms} onChange={(e) => setRooms(Number(e.target.value))}>{[1, 2, 3, 4, 5].filter((n) => n <= Math.max(1, chosen.room.left ?? 5)).map((n) => <option key={n} value={n}>{n}</option>)}</select>
           </div>
           <div>
             <label htmlFor="bguests">Guests</label>
-            <input id="bguests" type="number" min={1} max={rooms * chosen.room.capacity} value={guests} onChange={(e) => setGuests(Number(e.target.value))} required />
+            <input id="bguests" type="number" min={1} max={chosen.room.capacity ? rooms * chosen.room.capacity : undefined} value={guests} onChange={(e) => setGuests(Number(e.target.value))} required />
           </div>
         </div>
 
@@ -157,7 +157,7 @@ export default function StayBooking(p: Props) {
         <div className="summary" aria-live="polite">
           {nights > 0 ? (
             <>
-              <span>{kes(chosen.room.pricePerNight)} × {nights} night{nights === 1 ? '' : 's'} × {rooms} room{rooms === 1 ? '' : 's'}</span>
+              <span>{kes(chosen.room.pricePerNight)} × {rooms} unit{rooms === 1 ? '' : 's'} <small>({nights} night{nights === 1 ? '' : 's'}, price is per unit)</small></span>
               <b>{kes(total)}</b>
             </>
           ) : (
@@ -167,7 +167,7 @@ export default function StayBooking(p: Props) {
 
         {!p.paymentReady && <p className="notice">Online payment is being set up, so booking is not open yet.</p>}
         {error && <p className="form-error" role="alert">{error}</p>}
-        <button className="btn solid" type="submit" style={{ width: '100%' }} disabled={busy || !p.paymentReady || nights < 1}>
+        <button className="btn solid" type="submit" style={{ width: '100%' }} disabled={busy || !p.paymentReady || nights < 1 || chosen.room.left === 0}>
           {busy ? 'Taking you to secure payment…' : `Pay ${total ? kes(total) : ''} securely`}
         </button>
         <p className="hint">Payment is handled by Paystack (cards and M-Pesa). Your room is confirmed once the payment succeeds.</p>

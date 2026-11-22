@@ -14,9 +14,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <span className="script">A&amp;B</span>
         {signedIn && (
           <nav>
+            <Link href="/admin/rsvp">RSVP</Link>
+            <Link href="/admin/checkin">Check-in</Link>
             <Link href="/admin/guests">Guests</Link>
             <Link href="/admin/invitations">Invitations</Link>
-            <Link href="/admin/rsvps">Responses</Link>
+            <Link href="/admin/rsvps">Invite replies</Link>
             <Link href="/admin/bookings">Bookings</Link>
             <Link href="/admin/gifts">Gifts</Link>
             <LogoutButton />

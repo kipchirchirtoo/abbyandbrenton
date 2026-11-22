@@ -79,3 +79,28 @@ Every booking, with the guest's name, email, phone, dates, room and total, appea
 - Admin login is one shared password with a signed session cookie (not Supabase Auth).
 - No email delivery/bounce tracking yet (needs Resend webhooks).
 - Room availability is not tracked (no inventory limit per room type); admin reviews bookings in `/admin/bookings`.
+
+
+## RSVP, personalised invitation, QR check-in
+
+**Flow.** Guest sees the countdown, fills in the RSVP (full names of everyone, optional accommodation), the RSVP is saved, a personalised
+invitation card with a unique QR code appears (download as image / PDF, save to phone) and is emailed if email is configured.
+On the day the wedding team scans QR codes at `/admin/checkin` (camera) or searches by name / phone / reference.
+
+**Deadline.** RSVPs close at 11:59:59 PM, 30 December 2026, Africa/Nairobi (the stored cut-off instant is `2026-12-31T00:00:00+03:00`).
+It is enforced in three places: the API (`/api/rsvp/submit`), the database function `submit_rsvp_response`, and the form/closure screen.
+The countdown runs on the server's clock, not the visitor's. Admin > RSVP can follow the deadline, reopen RSVPs, or close them now.
+
+**Database.** Run, in order, every file in `supabase/migrations/` (the new one is `202611220001_rsvp_system.sql`). It adds
+`wedding_settings`, `wedding_responses`, `wedding_response_guests`, `wedding_stay_requests` and the functions `rsvp_is_open()` and
+`submit_rsvp_response(jsonb)`. All tables have RLS on with no policies: only the server's secret key can touch them.
+
+**Environment variables** (no new ones): `NEXT_PUBLIC_SITE_URL` (used in links and QR codes; set it to the real https address),
+`SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, and for email `RESEND_API_KEY` + `RESEND_FROM`
+(an address on a domain verified in Resend). Without Resend the site still works: the guest gets the card on screen and the app never
+claims an email was sent.
+
+**QR codes** contain only `https://your-site/v/<random 128-bit id>`. No names, phone numbers or emails. A normal phone camera shows a neutral
+page; only a signed-in admin is taken to the check-in screen. Guests' private links are `/invitation/<43 random characters>` (only a hash is stored).
+
+**Camera** needs https (Vercel provides it) and is allowed only on `/admin/*` (Permissions-Policy).
