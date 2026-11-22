@@ -4,8 +4,8 @@ import { RSVP_CLOSES_AT, type RsvpMode, type RsvpStatus } from '@/lib/rsvp/confi
 
 type Settings = { mode: RsvpMode; closesAt: number; dbOk: boolean };
 
-const OK_TTL = 15_000; // how long a good answer is reused
-const FAIL_TTL = 30_000; // how long a failure is remembered (so a dead database does not slow every request)
+const OK_TTL = 3_000; // how long a good answer is reused
+const FAIL_TTL = 10_000; // how long a failure is remembered (so a dead database does not slow every request)
 const QUERY_TIMEOUT = 1500;
 let cached: { at: number; value: Settings } | null = null;
 
