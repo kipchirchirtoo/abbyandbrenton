@@ -111,7 +111,10 @@ export default function RsvpAdmin({ records, mode, open, closesAt }: Props) {
                 <Fragment key={r.id}>
                   <tr>
                     <td><b>{r.reference}</b><br /><small>{fmtDateTime(r.submittedAt)}</small></td>
-                    <td>{r.fullName}</td>
+                    <td>
+                      {r.fullName}
+                      {r.message && <><br /><small className="row-message">💬 “{r.message.length > 90 ? r.message.slice(0, 90) + '…' : r.message}”</small></>}
+                    </td>
                     <td><a href={`mailto:${r.email}`}>{r.email}</a><br /><a href={`https://wa.me/${r.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">{r.whatsapp}</a></td>
                     <td><span className={`pill ${r.attending ? 'accepted' : 'declined'}`}>{r.attending ? 'Attending' : 'Declined'}</span></td>
                     <td>{r.attending ? <>{r.adults + r.children}<br /><small>{r.adults}A{r.children ? ` · ${r.children}C` : ''}</small></> : '—'}</td>
@@ -145,7 +148,7 @@ export default function RsvpAdmin({ records, mode, open, closesAt }: Props) {
                             {r.dietary && <p><b>Dietary:</b> {r.dietary}</p>}
                             {r.accessibility && <p><b>Accessibility:</b> {r.accessibility}</p>}
                             {r.specialRequests && <p><b>Requests:</b> {r.specialRequests}</p>}
-                            {r.message && <p><b>Message:</b> “{r.message}”</p>}
+                            <p><b>Message to the couple:</b> {r.message ? <>“{r.message}”</> : <span className="hint">none left</span>}</p>
                           </div>
                           <div>
                             <h3>Accommodation</h3>
