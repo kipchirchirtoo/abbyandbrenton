@@ -153,7 +153,7 @@ export function parseBooking(
   if (input.checkIn < stay.minDate || input.checkOut > stay.maxDate) {
     return { error: 'Those dates are outside the booking window for this wedding.' };
   }
-  if (!Number.isInteger(input.rooms) || input.rooms < 1 || input.rooms > 5) return { error: 'You can book between 1 and 5 rooms online.' };
+  if (!Number.isInteger(input.rooms) || input.rooms < 1 || input.rooms > 20) return { error: 'You can book between 1 and 20 units online.' };
   if (!Number.isInteger(input.guests) || input.guests < 1) return { error: 'Please enter the number of guests.' };
   if (found.room.capacity && input.guests > input.rooms * found.room.capacity) {
     return { error: `That room sleeps up to ${found.room.capacity} guests. Please add another room.` };

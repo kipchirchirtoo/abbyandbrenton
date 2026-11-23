@@ -47,7 +47,8 @@ export default function StayBooking(p: Props) {
   const [hotelId, roomId] = sel.split('|');
   const chosen = flat.find((x) => x.hotel.id === hotelId && x.room.id === roomId) ?? flat[0];
   const nights = Math.max(0, dayNumber(checkOut) - dayNumber(checkIn));
-  const total = nights > 0 ? chosen.room.pricePerNight * rooms : 0;
+  const count = Math.min(rooms, Math.max(1, chosen.room.left ?? 20));
+  const total = nights > 0 ? chosen.room.pricePerNight * count : 0;
 
   function choose(hid: string, rid: string) {
     setSel(`${hid}|${rid}`);
@@ -62,7 +63,7 @@ export default function StayBooking(p: Props) {
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hotelId: chosen.hotel.id, roomId: chosen.room.id, checkIn, checkOut, rooms, guests, fullName, email, phone, notes }),
+        body: JSON.stringify({ hotelId: chosen.hotel.id, roomId: chosen.room.id, checkIn, checkOut, rooms: count, guests, fullName, email, phone, notes }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.url) throw new Error(data.error || 'Something went wrong.');
@@ -136,12 +137,13 @@ export default function StayBooking(p: Props) {
         </div>
         <div className="two">
           <div>
-            <label htmlFor="brooms">Rooms</label>
-            <select id="brooms" value={rooms} onChange={(e) => setRooms(Number(e.target.value))}>{[1, 2, 3, 4, 5].filter((n) => n <= Math.max(1, chosen.room.left ?? 5)).map((n) => <option key={n} value={n}>{n}</option>)}</select>
+            <label htmlFor="brooms">How many {chosen.room.name.toLowerCase()}s?</label>
+            <select id="brooms" value={Math.min(rooms, Math.max(1, chosen.room.left ?? 20))} onChange={(e) => setRooms(Number(e.target.value))}>{Array.from({ length: Math.min(20, Math.max(1, chosen.room.left ?? 20)) }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n} {chosen.room.name.toLowerCase()}{n === 1 ? '' : 's'}</option>)}</select>
+            <small className="hint left">Each one is the whole {chosen.room.name.toLowerCase()}, not a single bedroom.</small>
           </div>
           <div>
             <label htmlFor="bguests">Guests</label>
-            <input id="bguests" type="number" min={1} max={chosen.room.capacity ? rooms * chosen.room.capacity : undefined} value={guests} onChange={(e) => setGuests(Number(e.target.value))} required />
+            <input id="bguests" type="number" min={1} max={chosen.room.capacity ? count * chosen.room.capacity : undefined} value={guests} onChange={(e) => setGuests(Number(e.target.value))} required />
           </div>
         </div>
 
@@ -157,7 +159,7 @@ export default function StayBooking(p: Props) {
         <div className="summary" aria-live="polite">
           {nights > 0 ? (
             <>
-              <span>{kes(chosen.room.pricePerNight)} × {rooms} unit{rooms === 1 ? '' : 's'} <small>({nights} night{nights === 1 ? '' : 's'}, price is per unit)</small></span>
+              <span>{kes(chosen.room.pricePerNight)} × {count} {chosen.room.name.toLowerCase()}{count === 1 ? '' : 's'} <small>({nights} night{nights === 1 ? '' : 's'}, price is per unit)</small></span>
               <b>{kes(total)}</b>
             </>
           ) : (
