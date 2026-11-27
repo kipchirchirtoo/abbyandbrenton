@@ -4,7 +4,8 @@ import SketchMap from '@/components/site/SketchMap';
 import { AddToCalendar } from '@/components/site/Countdown';
 import PrivateAccess from '@/components/PrivateAccess';
 import { getSiteAccess } from '@/lib/guest-session';
-import { venue } from '@/lib/content';
+import VenueGallery from '@/components/site/VenueGallery';
+import { stay, venue } from '@/lib/content';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Location — Abigael & Brenton' };
@@ -12,13 +13,15 @@ export const metadata: Metadata = { title: 'Location — Abigael & Brenton' };
 export default async function Location() {
   const access = await getSiteAccess();
   if (!access.allowed) return <PrivateAccess reason={access.reason} />;
+  const photos = stay.hotels[0]?.gallery ?? [];
   const q = encodeURIComponent(venue.mapQuery).replace(/%20/g, '+');
 
   return (
     <>
-      <PageHero eyebrow="Location" title={venue.name} sub={`${venue.area}, ${venue.country}`} image="/photos/gallery/venue-3.jpg" position="center" />
+      <PageHero eyebrow="Location" title={venue.name} sub={`${venue.area}, ${venue.country}`} image={photos[0]} position="center" />
 
       <section className="reveal section wide">
+        {photos.length > 0 && <VenueGallery images={photos.slice(0, 9)} title={venue.name} />}
         <div className="cards">
           <div className="card-d"><h3>Ceremony</h3><p>Friday · 2:00 PM<br />Guests welcome from 1:30 PM</p></div>
           <div className="card-d"><h3>Reception</h3><p>Friday · 5:00 PM<br />{venue.name}</p></div>

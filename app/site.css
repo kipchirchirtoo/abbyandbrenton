@@ -341,3 +341,9 @@ button.room-img:disabled{cursor:default}
 .map-card-body p{color:var(--muted)}
 .map-card-body .btn{margin-top:18px}
 @media (max-width:700px){.map-card{grid-template-columns:1fr}.sketch-map{min-height:0;aspect-ratio:4/3}}
+
+/* ---------- Venue photo grid (Location page) ---------- */
+.venue-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 40px; }
+.venue-gallery button { aspect-ratio: 4 / 3; border: 0; padding: 0; border-radius: 6px; background-size: cover; background-position: center; cursor: zoom-in; }
+.venue-gallery button:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+@media (max-width: 640px) { .venue-gallery { grid-template-columns: repeat(2, 1fr); } .venue-gallery button:first-child { grid-column: span 2; grid-row: auto; aspect-ratio: 4 / 3; } }
