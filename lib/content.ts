@@ -21,7 +21,7 @@ export const nav = [
   { href: '/', label: 'The Day' },
   { href: '/our-story', label: 'Our Story' },
   { href: '/gallery', label: 'Gallery' },
-  { href: '/bridal-team', label: 'Bridal Team' },
+  { href: '/bridal-team', label: 'The Party' },
   { href: '/programme', label: 'Programme' },
   { href: '/dress-code', label: 'Dress Code' },
   { href: '/location', label: 'Location' },
@@ -103,13 +103,14 @@ export const faqs: { q: string; a: string }[] = [
 ];
 
 /* ---------------- Bridal team ---------------- */
-// TODO: add names/roles to show a list of people. Leave empty to hide the list.
-export const bridalMembers: { name: string; role: string; side: 'bride' | 'groom' }[] = [];
+// Add each person here to replace a placeholder card on The Party page: { name: 'Full Name', role: 'Best man', side: 'groom' } (side 'bride' for bridesmaids).
+// Add `photo: '/photos/...'` later when you have one. Until then the page shows "Name coming soon" placeholders.
+export const bridalMembers: { name: string; role: string; side: 'bride' | 'groom'; photo?: string }[] = [];
 
 export const bridalStory = {
   title: 'The people who made us who we are',
   paragraphs: [
-    'Behind every great love story is a circle of people who laughed with us, prayed for us and carried us through every season. Our bridal team is that circle.',
+    'Behind every great love story is a circle of people who laughed with us, prayed for us and carried us through every season. Our party is that circle.',
     'They are the friends who listened to the late-night worries, the ones who showed up with food, with laughter and with the right words at the right time. They have been part of our story long before the proposal, and we could not imagine standing at the altar without them.',
     'To our bridesmaids and groomsmen: thank you for your love, your time and your joy. We are so grateful to have you beside us on our day.',
   ],
