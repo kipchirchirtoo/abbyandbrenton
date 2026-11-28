@@ -1,5 +1,6 @@
 import { signatureIsValid } from '@/lib/paystack';
 import { applyPaystackResult } from '@/lib/bookings';
+import { applyPaystackGiftResult } from '@/lib/gifts';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,12 +23,19 @@ export async function POST(req: Request) {
     };
     const d = event.data;
     if (d?.reference && (event.event === 'charge.success' || event.event === 'charge.failed')) {
-      await applyPaystackResult(d.reference, {
-        success: event.event === 'charge.success' && d.status === 'success',
+      const isSuccess = event.event === 'charge.success' && d.status === 'success';
+      const result = {
+        success: isSuccess,
         amountMinor: Number(d.amount ?? 0),
         currency: String(d.currency ?? ''),
         id: String(d.id ?? ''),
-      });
+      };
+
+      if (d.reference.startsWith('GF-') || d.reference.startsWith('GIFT-')) {
+        await applyPaystackGiftResult(d.reference, result);
+      } else {
+        await applyPaystackResult(d.reference, result);
+      }
     }
   } catch {
     // Acknowledge anyway: a valid signature means it came from Paystack, and retries would not fix a parse error.

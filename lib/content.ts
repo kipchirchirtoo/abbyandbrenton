@@ -98,7 +98,7 @@ export const faqs: { q: string; a: string }[] = [
   { q: 'Where can I stay?', a: 'You can book and pay for a room on the Book a Room page. We recommend booking early as the coast is busy in January.' },
   { q: 'Is there parking?', a: 'Yes. Please follow the ushers’ directions when you arrive. We encourage carpooling where you can.' },
   { q: 'Will photos be taken?', a: 'Our photographers will capture the day. Please enjoy the moment and share your favourites with ' + couple.hashtag + '.' },
-  { q: 'How can I send a gift?', a: 'Your presence is the greatest gift. If you would like to contribute, use the M-Pesa Gift page.' },
+  { q: 'How can I send a gift?', a: 'Your presence is the greatest gift. If you would like to contribute, use the Send a Gift page to pay securely with Paystack (card, Apple Pay, bank transfer) or M-Pesa.' },
   { q: 'Who do I contact with questions?', a: 'Please reach out to the couple or the bridal team and we will be glad to help.' },
 ];
 

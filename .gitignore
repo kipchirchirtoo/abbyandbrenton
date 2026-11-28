@@ -7,3 +7,6 @@ node_modules/
 *.tsbuildinfo
 next-env.d.ts
 js/
+temp_chrome/
+screen*.png
+pnpm-lock.yaml
