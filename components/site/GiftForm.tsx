@@ -43,7 +43,9 @@ export default function GiftForm({
   const [method, setMethod] = useState<'mpesa' | 'card'>('mpesa');
 
   // Input fields
-  const [copied, setCopied] = useState(false);
+  const [copiedPaybill, setCopiedPaybill] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
   const [name, setName] = useState(defaultName);
   const [phone, setPhone] = useState('');
   const [amount, setAmount] = useState('1000');
@@ -72,12 +74,20 @@ export default function GiftForm({
     };
   }, []);
 
-  // Copies the manual M-Pesa number
-  async function copyMpesa() {
+  // Copies text to clipboard
+  async function copyText(text: string, type: 'paybill' | 'account' | 'phone') {
     try {
-      await navigator.clipboard.writeText(gift.mpesaNumber);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(text);
+      if (type === 'paybill') {
+        setCopiedPaybill(true);
+        setTimeout(() => setCopiedPaybill(false), 2000);
+      } else if (type === 'account') {
+        setCopiedAccount(true);
+        setTimeout(() => setCopiedAccount(false), 2000);
+      } else {
+        setCopiedPhone(true);
+        setTimeout(() => setCopiedPhone(false), 2000);
+      }
     } catch {}
   }
 
@@ -302,14 +312,64 @@ export default function GiftForm({
 
   return (
     <div className="gift-grid">
-      {/* Left Card: Send Directly with M-Pesa */}
+      {/* Left Card: Send Directly with M-Pesa Paybill or Phone */}
       <div className="gift-card manual">
-        <p className="eyebrow">Send directly with M-Pesa</p>
-        <p className="mpesa-num">{gift.mpesaDisplay}</p>
-        <p className="hint">Open M-Pesa → Send Money → enter this number. Thank you for your generosity.</p>
-        <div className="gift-actions">
-          <button className="btn" type="button" onClick={copyMpesa}>{copied ? 'Copied ✓' : 'Copy number'}</button>
-          <a className="btn" href={`tel:${gift.mpesaNumber}`}>Call to confirm</a>
+        <p className="eyebrow">Lipa na M-Pesa (Paybill)</p>
+
+        <div style={{ margin: '14px 0 16px', padding: '16px', background: 'rgba(255,255,255,0.08)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.18)' }}>
+          <p style={{ margin: 0, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#f1dfae' }}>Paybill Business No</p>
+          <p style={{ margin: '2px 0 10px', fontSize: '2.2rem', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif", letterSpacing: '0.04em', color: '#fff' }}>
+            {gift.paybill}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', textAlign: 'left', fontSize: '0.88rem', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '10px' }}>
+            <div>
+              <span style={{ color: '#dcd6c2', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block' }}>Business Name</span>
+              <strong style={{ color: '#fff' }}>{gift.businessName}</strong>
+            </div>
+            <div>
+              <span style={{ color: '#dcd6c2', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block' }}>Account Number</span>
+              <strong style={{ color: '#f1dfae', fontFamily: 'monospace', fontSize: '1.05rem', letterSpacing: '0.05em' }}>{gift.accountNumber}</strong>
+            </div>
+            <div>
+              <span style={{ color: '#dcd6c2', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block' }}>Account Name</span>
+              <strong style={{ color: '#fff' }}>{gift.accountName}</strong>
+            </div>
+          </div>
+        </div>
+
+        <p className="hint" style={{ fontSize: '0.82rem', lineHeight: 1.5, margin: '10px 0 16px', color: '#e5ded0' }}>
+          Open M-Pesa → Lipa na M-Pesa → Paybill → Business <strong>{gift.paybill}</strong> → Account <strong>{gift.accountNumber}</strong>.
+        </p>
+
+        <div className="gift-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button className="btn" type="button" onClick={() => copyText(gift.paybill, 'paybill')}>
+            {copiedPaybill ? 'Copied Paybill ✓' : 'Copy Paybill'}
+          </button>
+          <button className="btn" type="button" onClick={() => copyText(gift.accountNumber, 'account')}>
+            {copiedAccount ? 'Copied Acc No ✓' : 'Copy Acc No'}
+          </button>
+        </div>
+
+        <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.14)', fontSize: '0.82rem', color: '#dcd6c2' }}>
+          <span>Or send directly via Send Money: </span>
+          <strong style={{ color: '#fff' }}>{gift.mpesaDisplay}</strong>
+          <div style={{ marginTop: '8px', display: 'flex', gap: '6px', justifyContent: 'center' }}>
+            <button
+              type="button"
+              className="btn"
+              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              onClick={() => copyText(gift.mpesaNumber, 'phone')}
+            >
+              {copiedPhone ? 'Copied ✓' : 'Copy Phone'}
+            </button>
+            <a
+              className="btn"
+              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              href={`tel:${gift.mpesaNumber}`}
+            >
+              Call to Confirm
+            </a>
+          </div>
         </div>
       </div>
 
@@ -342,7 +402,9 @@ export default function GiftForm({
             <div className="stk-steps-box">
               <ol>
                 <li>Check your phone right now (an M-Pesa prompt will pop up on your screen).</li>
-                <li>Verify the amount: <strong>KES {Number(amount).toLocaleString('en-KE')}</strong> to <strong>Paystack / SACCOMPLY</strong>.</li>
+                <li>
+                  Verify recipient: <strong>LIPWA SOLUTIONS</strong> for account <strong>BRENTON KIPRUTO</strong> (Paybill <strong>{gift.paybill}</strong>, Acc <strong>{gift.accountNumber}</strong>).
+                </li>
                 <li>Enter your <strong>M-Pesa PIN</strong> and press <strong>OK</strong>.</li>
               </ol>
             </div>
@@ -442,7 +504,7 @@ export default function GiftForm({
                   required
                 />
                 <small className="hint left" style={{ fontSize: '0.78rem', color: 'var(--muted)', display: 'block', marginTop: '4px' }}>
-                  An M-Pesa prompt will pop up directly on your phone screen to enter your PIN.
+                  An instant prompt will pop up on your phone from <strong>LIPWA SOLUTIONS</strong> (Account: <strong>BRENTON KIPRUTO</strong>) to enter your M-Pesa PIN.
                 </small>
               </>
             ) : (

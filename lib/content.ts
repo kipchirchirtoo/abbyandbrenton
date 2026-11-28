@@ -240,9 +240,13 @@ export const stay = {
 
 /* ---------------- Gifts ---------------- */
 export const gift = {
-  // The M-Pesa number that gifts go to (shown to guests).
+  // Official Paybill details
+  paybill: '862862',
+  businessName: 'LIPWA SOLUTIONS',
+  accountNumber: '0170230003880',
+  accountName: 'BRENTON KIPRUTO',
+  // Direct M-Pesa phone number
   mpesaNumber: '0716355642',
   mpesaDisplay: '0716 355 642',
-  accountName: 'Abigael & Brenton Wedding',
 };
 
