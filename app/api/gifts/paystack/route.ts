@@ -35,18 +35,21 @@ export async function POST(req: Request) {
 
   const data = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
   const amount = Number(data.amount);
-  const email = String(data.email ?? '').trim();
+  const rawEmail = String(data.email ?? '').trim();
   const name = String(data.name ?? '').trim();
   const phone = String(data.phone ?? '').trim();
   const notes = String(data.notes ?? '').trim();
+  const channel = (data.channel === 'mobile_money' || data.channel === 'card') ? data.channel : 'all';
 
   if (!Number.isFinite(amount) || amount < 10) {
     return Response.json({ error: 'Please enter a valid gift amount (at least KES 10).' }, { status: 400 });
   }
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return Response.json({ error: 'Please provide a valid email address so Paystack can send your receipt.' }, { status: 400 });
-  }
+  const cleanDigits = phone.replace(/\D/g, '');
+  const email =
+    rawEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)
+      ? rawEmail
+      : `${cleanDigits || 'guest'}@abigaelandbrenton.com`;
 
   if (!rateLimit(`gift-create:${clientIp(req)}`, 10, 10 * 60_000)) {
     return Response.json({ error: 'Too many attempts from this connection. Please wait a few minutes.' }, { status: 429 });
@@ -67,6 +70,7 @@ export async function POST(req: Request) {
       phone,
       notes,
       guestId,
+      channel,
     });
 
     return Response.json({ ok: true, url: authorizationUrl, reference });

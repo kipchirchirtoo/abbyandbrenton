@@ -34,11 +34,12 @@ export function maskPhone(phone: string): string {
 
 export type CreateGiftInput = {
   amount: number;
-  email: string;
+  email?: string;
   name?: string;
   phone?: string;
   notes?: string;
   guestId?: string | null;
+  channel?: 'mobile_money' | 'card' | 'all';
 };
 
 /**
@@ -50,9 +51,10 @@ export async function createPaystackGift(opts: CreateGiftInput): Promise<{ autho
     throw new Error('Please enter a valid gift amount (minimum KES 10).');
   }
 
-  const email = (opts.email || '').trim().toLowerCase();
+  const cleanPhone = (opts.phone || '').replace(/\D/g, '');
+  const email = (opts.email || '').trim().toLowerCase() || `${cleanPhone || 'guest'}@abigaelandbrenton.com`;
   if (!EMAIL_RE.test(email)) {
-    throw new Error('Please enter a valid email address to receive your payment receipt.');
+    throw new Error('Please enter a valid email address.');
   }
 
   const site = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '');
@@ -83,17 +85,28 @@ export async function createPaystackGift(opts: CreateGiftInput): Promise<{ autho
   }
 
   try {
+    const channels =
+      opts.channel === 'mobile_money'
+        ? ['mobile_money']
+        : opts.channel === 'card'
+          ? ['card']
+          : ['mobile_money', 'card'];
+
     const { authorizationUrl } = await initializeTransaction({
       email,
       amountMinor: amount * 100, // Paystack expects cents
       currency: 'KES',
       reference,
       callbackUrl: `${site}/gift?reference=${reference}`,
+      channels,
       metadata: {
         type: 'wedding_gift',
         giver_name: giverName,
         phone: opts.phone || undefined,
         notes: resultDesc,
+        custom_fields: opts.phone
+          ? [{ display_name: 'Mobile Number', variable_name: 'phone', value: opts.phone }]
+          : undefined,
       },
     });
 

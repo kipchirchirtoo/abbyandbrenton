@@ -20,6 +20,7 @@ export async function initializeTransaction(opts: {
   reference: string;
   callbackUrl: string;
   metadata?: Record<string, unknown>;
+  channels?: string[];
 }): Promise<{ authorizationUrl: string }> {
   const res = await fetch(`${API}/transaction/initialize`, {
     method: 'POST',
@@ -32,6 +33,7 @@ export async function initializeTransaction(opts: {
       reference: opts.reference,
       callback_url: opts.callbackUrl,
       metadata: opts.metadata,
+      ...(opts.channels ? { channels: opts.channels } : {}),
     }),
   });
   const data = (await res.json().catch(() => ({}))) as { status?: boolean; data?: { authorization_url?: string } };
