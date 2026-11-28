@@ -2,6 +2,7 @@ import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { initializeTransaction, getSiteUrl, chargeMobileMoney } from '@/lib/paystack';
+import { initiatePayHeroStk, payheroConfigured } from '@/lib/payhero';
 
 export type WeddingGiftRow = {
   id: string;
@@ -253,6 +254,46 @@ export async function chargePaystackMpesaGift(opts: {
     throw new Error('We could not save your gift request. Please try again.');
   }
 
+  // 1. Try PayHero first (direct instant M-Pesa to Till 1695389)
+  if (payheroConfigured()) {
+    const payheroRes = await initiatePayHeroStk({
+      amount,
+      phone: formattedPhone,
+      reference,
+      customerName: giverName || 'Wedding Guest',
+    });
+
+    if (payheroRes.success) {
+      await db
+        .from('wedding_gifts')
+        .update({ merchant_request_id: 'payhero', result_desc: 'PayHero STK sent' })
+        .eq('checkout_request_id', reference);
+
+      return {
+        ok: true,
+        reference,
+        status: 'pending',
+        message: 'M-Pesa STK prompt sent to your phone. Please enter your PIN to complete.',
+      };
+    }
+
+    if (payheroRes.message?.includes('inactive')) {
+      // Channel inactive on PayHero
+      await db
+        .from('wedding_gifts')
+        .update({ status: 'failed', result_desc: payheroRes.message })
+        .eq('checkout_request_id', reference);
+
+      return {
+        ok: false,
+        reference,
+        status: 'failed',
+        message: 'Your PayHero Till (1695389) is currently inactive. Please go to your PayHero dashboard -> Payment Channels and activate it.',
+      };
+    }
+  }
+
+  // 2. Fall back to Paystack Live M-Pesa gateway
   const chargeResult = await chargeMobileMoney({
     phone: formattedPhone,
     amountMinor: amount * 100,
