@@ -8,9 +8,11 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  */
 const API = 'https://api.paystack.co';
 
-const FALLBACK_TEST_KEY = 'sk_test_133d6b260d0d7d0de7ba0df64427075a9d2b0cc3';
+const FALLBACK_TEST_KEY = 'sk_test_c8ef795b542ef9e9334faa0f22ea7270078d726d';
+const FALLBACK_PUBLIC_KEY = 'pk_test_2232f43850b16f5ce643e4ff18180f77281872da';
 
 export const getPaystackSecretKey = () => process.env.PAYSTACK_SECRET_KEY || FALLBACK_TEST_KEY;
+export const getPaystackPublicKey = () => process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || FALLBACK_PUBLIC_KEY;
 
 export const paystackConfigured = () => Boolean(getPaystackSecretKey());
 
@@ -62,6 +64,42 @@ export async function initializeTransaction(opts: {
   const data = (await res.json().catch(() => ({}))) as { status?: boolean; data?: { authorization_url?: string } };
   if (!res.ok || !data.status || !data.data?.authorization_url) throw new Error('paystack_init_failed');
   return { authorizationUrl: data.data.authorization_url };
+}
+
+/** Directly charges an M-Pesa mobile money account, triggering an STK push prompt without redirecting to an external checkout. */
+export async function chargeMobileMoney(opts: {
+  phone: string;
+  amountMinor: number;
+  email: string;
+  reference: string;
+  metadata?: Record<string, unknown>;
+}): Promise<{
+  status: boolean;
+  message: string;
+  data?: {
+    status: string;
+    reference: string;
+    id?: number | string;
+    message?: string;
+  };
+}> {
+  const res = await fetch(`${API}/charge`, {
+    method: 'POST',
+    headers: auth(),
+    cache: 'no-store',
+    body: JSON.stringify({
+      email: opts.email,
+      amount: opts.amountMinor,
+      currency: 'KES',
+      reference: opts.reference,
+      mobile_money: {
+        phone: opts.phone,
+        provider: 'mpesa',
+      },
+      metadata: opts.metadata,
+    }),
+  });
+  return res.json().catch(() => ({ status: false, message: 'Could not contact payment gateway' }));
 }
 
 export type VerifiedTransaction = {

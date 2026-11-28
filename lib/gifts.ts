@@ -1,7 +1,7 @@
 import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { initializeTransaction, getSiteUrl } from '@/lib/paystack';
+import { initializeTransaction, getSiteUrl, chargeMobileMoney } from '@/lib/paystack';
 
 export type WeddingGiftRow = {
   id: string;
@@ -192,4 +192,126 @@ export async function getGiftByReference(reference: string): Promise<WeddingGift
     .eq('checkout_request_id', reference)
     .maybeSingle<WeddingGiftRow>();
   return data;
+}
+
+/**
+ * Initiates an internal M-Pesa STK push via Paystack directly without external redirect.
+ */
+export async function chargePaystackMpesaGift(opts: {
+  amount: number;
+  phone: string;
+  name?: string;
+  email?: string;
+  notes?: string;
+  guestId?: string | null;
+}): Promise<{
+  ok: boolean;
+  reference: string;
+  status: 'success' | 'pending' | 'failed';
+  message: string;
+}> {
+  const amount = Math.round(Number(opts.amount));
+  if (!Number.isFinite(amount) || amount < 10) {
+    throw new Error('Please enter a valid gift amount (minimum KES 10).');
+  }
+
+  // Format phone to international +254...
+  let raw = opts.phone.replace(/[\s\-()]/g, '');
+  let formattedPhone = raw;
+  if (/^0[17]\d{8}$/.test(raw)) {
+    formattedPhone = '+254' + raw.slice(1);
+  } else if (/^254[17]\d{8}$/.test(raw)) {
+    formattedPhone = '+' + raw;
+  } else if (/^\+254[17]\d{8}$/.test(raw)) {
+    formattedPhone = raw;
+  } else if (raw === '0710000000' || raw === '254710000000' || raw === '+254710000000') {
+    formattedPhone = '+254710000000';
+  } else {
+    formattedPhone = raw.startsWith('+') ? raw : (raw.startsWith('254') ? '+' + raw : '+254' + raw.replace(/^0+/, ''));
+  }
+
+  const cleanDigits = formattedPhone.replace(/\D/g, '');
+  const email = (opts.email || '').trim().toLowerCase() || `${cleanDigits || 'guest'}@abigaelandbrenton.com`;
+
+  const reference = newGiftReference();
+  const db = getAdminClient();
+  const giverName = (opts.name || '').trim().slice(0, 80) || null;
+  const resultDesc = (opts.notes || '').trim().slice(0, 300) || 'Wedding gift via M-Pesa';
+
+  const { error: insertError } = await db.from('wedding_gifts').insert({
+    checkout_request_id: reference,
+    merchant_request_id: 'paystack',
+    amount,
+    phone_masked: maskPhone(formattedPhone),
+    giver_name: giverName,
+    guest_id: opts.guestId || null,
+    status: 'pending',
+    result_desc: resultDesc,
+  });
+
+  if (insertError) {
+    throw new Error('We could not save your gift request. Please try again.');
+  }
+
+  const chargeResult = await chargeMobileMoney({
+    phone: formattedPhone,
+    amountMinor: amount * 100,
+    email,
+    reference,
+    metadata: {
+      type: 'wedding_gift',
+      giver_name: giverName,
+      phone: formattedPhone,
+      notes: resultDesc,
+    },
+  });
+
+  // If charge succeeded right away (or test payment with test number)
+  if (chargeResult.status && chargeResult.data?.status === 'success') {
+    await db
+      .from('wedding_gifts')
+      .update({
+        status: 'success',
+        mpesa_receipt: String(chargeResult.data.id || reference),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('checkout_request_id', reference);
+
+    return {
+      ok: true,
+      reference,
+      status: 'success',
+      message: 'Gift received! Thank you so much. ❤️',
+    };
+  }
+
+  // If prompt was dispatched to phone and waiting for PIN (pay_offline or pending or timeout)
+  if (chargeResult.status || chargeResult.data?.status === 'pay_offline' || chargeResult.data?.status === 'pending') {
+    return {
+      ok: true,
+      reference,
+      status: 'pending',
+      message: chargeResult.data?.message || 'M-Pesa STK prompt sent to your phone. Please enter your PIN to complete.',
+    };
+  }
+
+  // If test mode declined because of real number:
+  if (chargeResult.data?.message?.includes('test mobile money number')) {
+    await db.from('wedding_gifts').update({ status: 'failed', result_desc: 'Test mode requires test number 0710000000' }).eq('checkout_request_id', reference);
+    return {
+      ok: false,
+      reference,
+      status: 'failed',
+      message: 'Paystack is in Test Mode: use test number 0710 000 000 to test, or toggle to Live Mode in your Paystack dashboard for real phone prompts.',
+    };
+  }
+
+  const failMsg = chargeResult.message || chargeResult.data?.message || 'Could not send M-Pesa prompt.';
+  await db.from('wedding_gifts').update({ status: 'failed', result_desc: failMsg }).eq('checkout_request_id', reference);
+  return {
+    ok: false,
+    reference,
+    status: 'failed',
+    message: failMsg,
+  };
 }

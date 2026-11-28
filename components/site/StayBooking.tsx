@@ -66,8 +66,63 @@ export default function StayBooking(p: Props) {
         body: JSON.stringify({ hotelId: chosen.hotel.id, roomId: chosen.room.id, checkIn, checkOut, rooms: count, guests, fullName, email, phone, notes }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.url) throw new Error(data.error || 'Something went wrong.');
-      window.location.href = data.url; // Paystack hosted checkout
+      if (!res.ok || (!data.url && !data.reference)) throw new Error(data.error || 'Something went wrong.');
+
+      const fallbackKey = 'pk_test_2232f43850b16f5ce643e4ff18180f77281872da';
+      const pubKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || fallbackKey;
+
+      const openInlineCheckout = () => {
+        const paystack = (window as unknown as { PaystackPop?: { setup: (opts: Record<string, unknown>) => { openIframe: () => void } } }).PaystackPop;
+        if (!paystack) {
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            setError('Could not load payment interface. Please try again.');
+            setBusy(false);
+          }
+          return;
+        }
+
+        const handler = paystack.setup({
+          key: pubKey,
+          email,
+          amount: total * 100,
+          currency: 'KES',
+          ref: data.reference,
+          metadata: {
+            custom_fields: [
+              { display_name: 'Hotel', variable_name: 'hotel', value: chosen.hotel.name },
+              { display_name: 'Room', variable_name: 'room', value: chosen.room.name },
+              { display_name: 'Guest Name', variable_name: 'guest_name', value: fullName },
+              { display_name: 'Phone', variable_name: 'phone', value: phone },
+            ],
+          },
+          onClose: () => {
+            setBusy(false);
+          },
+          callback: () => {
+            window.location.href = `/stay/booking/${data.reference}`;
+          },
+        });
+        handler.openIframe();
+      };
+
+      if (!(window as unknown as { PaystackPop?: unknown }).PaystackPop) {
+        const script = document.createElement('script');
+        script.src = 'https://js.paystack.co/v1/inline.js';
+        script.async = true;
+        script.onload = () => openInlineCheckout();
+        script.onerror = () => {
+          if (data.url) window.location.href = data.url;
+          else {
+            setError('Could not load payment interface. Please try again.');
+            setBusy(false);
+          }
+        };
+        document.body.appendChild(script);
+      } else {
+        openInlineCheckout();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
       setBusy(false);
