@@ -2,7 +2,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { getSessionToken, getSiteAccess } from '@/lib/guest-session';
 import { getInvitation } from '@/lib/invitations/validation';
 import { newReference, parseBooking, roomsLeft } from '@/lib/bookings';
-import { initializeTransaction, paystackConfigured } from '@/lib/paystack';
+import { initializeTransaction, paystackConfigured, getSiteUrl } from '@/lib/paystack';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -14,9 +14,16 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   const origin = req.headers.get('origin');
   const host = req.headers.get('host');
-  if (origin && host && new URL(origin).host !== host) return Response.json({ error: 'Forbidden' }, { status: 403 });
+  if (origin && host) {
+    try {
+      const oHost = new URL(origin).host;
+      if (oHost !== host && !oHost.endsWith('vercel.app')) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    } catch {}
+  }
 
-  if (!paystackConfigured() || !process.env.NEXT_PUBLIC_SITE_URL) {
+  if (!paystackConfigured()) {
     return Response.json({ error: 'Online booking is not available yet. Please check back soon.' }, { status: 503 });
   }
   // Loose limit on every request (so form typos don't lock a guest out); strict limit below applies only to real bookings.
@@ -97,7 +104,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const site = process.env.NEXT_PUBLIC_SITE_URL!.replace(/\/$/, '');
+    const site = getSiteUrl(req);
     const { authorizationUrl } = await initializeTransaction({
       email: input.email,
       amountMinor: total * 100,

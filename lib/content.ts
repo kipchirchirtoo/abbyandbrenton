@@ -241,8 +241,8 @@ export const stay = {
 /* ---------------- Gifts ---------------- */
 export const gift = {
   // The M-Pesa number that gifts go to (shown to guests).
-  mpesaNumber: '0716355462',
-  mpesaDisplay: '0716 355 462',
+  mpesaNumber: '0716355642',
+  mpesaDisplay: '0716 355 642',
   accountName: 'Abigael & Brenton Wedding',
 };
 

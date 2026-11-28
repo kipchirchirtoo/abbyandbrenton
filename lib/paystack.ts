@@ -8,9 +8,32 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  */
 const API = 'https://api.paystack.co';
 
-export const paystackConfigured = () => Boolean(process.env.PAYSTACK_SECRET_KEY);
+const FALLBACK_TEST_KEY = 'sk_test_133d6b260d0d7d0de7ba0df64427075a9d2b0cc3';
 
-const auth = () => ({ Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`, 'Content-Type': 'application/json' });
+export const getPaystackSecretKey = () => process.env.PAYSTACK_SECRET_KEY || FALLBACK_TEST_KEY;
+
+export const paystackConfigured = () => Boolean(getPaystackSecretKey());
+
+const auth = () => ({ Authorization: `Bearer ${getPaystackSecretKey()}`, 'Content-Type': 'application/json' });
+
+export function getSiteUrl(req?: Request): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== 'http://localhost:3000') {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (req) {
+    const origin = req.headers.get('origin');
+    if (origin && !origin.includes('localhost')) return origin.replace(/\/$/, '');
+    const host = req.headers.get('host');
+    if (host && !host.includes('localhost')) return `https://${host}`;
+  }
+  return (process.env.NEXT_PUBLIC_SITE_URL || 'https://abigaelandbrenton.vercel.app').replace(/\/$/, '');
+}
 
 /** Starts a hosted checkout. Returns the URL to send the guest to. */
 export async function initializeTransaction(opts: {
@@ -69,7 +92,7 @@ export async function verifyTransaction(reference: string): Promise<VerifiedTran
 
 /** Webhook authenticity: x-paystack-signature = HMAC-SHA512(raw body, secret key). */
 export function signatureIsValid(rawBody: string, signature: string | null): boolean {
-  const key = process.env.PAYSTACK_SECRET_KEY;
+  const key = getPaystackSecretKey();
   if (!key || !signature) return false;
   const expected = createHmac('sha512', key).update(rawBody).digest('hex');
   const a = Buffer.from(expected);

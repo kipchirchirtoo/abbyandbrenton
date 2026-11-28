@@ -48,7 +48,7 @@ export default async function Stay() {
         <h2>Rooms &amp; booking</h2>
         <StayBooking
           hotels={hotels}
-          paymentReady={paystackConfigured() && Boolean(process.env.NEXT_PUBLIC_SITE_URL)}
+          paymentReady={paystackConfigured()}
           preview={bookingPreview() && hotels.some((h) => h.rooms.some((r) => r.sample))}
           minDate={stay.minDate}
           maxDate={stay.maxDate}

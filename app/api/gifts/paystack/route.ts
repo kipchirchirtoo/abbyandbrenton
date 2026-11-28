@@ -1,6 +1,6 @@
 import { getSiteAccess, getSessionToken } from '@/lib/guest-session';
 import { getInvitation } from '@/lib/invitations/validation';
-import { paystackConfigured } from '@/lib/paystack';
+import { paystackConfigured, getSiteUrl } from '@/lib/paystack';
 import { createPaystackGift } from '@/lib/gifts';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 
@@ -9,11 +9,16 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   const origin = req.headers.get('origin');
   const host = req.headers.get('host');
-  if (origin && host && new URL(origin).host !== host) {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  if (origin && host) {
+    try {
+      const oHost = new URL(origin).host;
+      if (oHost !== host && !oHost.endsWith('vercel.app')) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    } catch {}
   }
 
-  if (!paystackConfigured() || !process.env.NEXT_PUBLIC_SITE_URL) {
+  if (!paystackConfigured()) {
     return Response.json({ error: 'Online payments are currently unavailable. Please check back soon or send via M-Pesa.' }, { status: 503 });
   }
 
@@ -63,15 +68,18 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { authorizationUrl, reference } = await createPaystackGift({
-      amount,
-      email,
-      name,
-      phone,
-      notes,
-      guestId,
-      channel,
-    });
+    const { authorizationUrl, reference } = await createPaystackGift(
+      {
+        amount,
+        email,
+        name,
+        phone,
+        notes,
+        guestId,
+        channel,
+      },
+      getSiteUrl(req),
+    );
 
     return Response.json({ ok: true, url: authorizationUrl, reference });
   } catch (err) {

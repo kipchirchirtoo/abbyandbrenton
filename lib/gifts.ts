@@ -1,7 +1,7 @@
 import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { initializeTransaction } from '@/lib/paystack';
+import { initializeTransaction, getSiteUrl } from '@/lib/paystack';
 
 export type WeddingGiftRow = {
   id: string;
@@ -45,7 +45,10 @@ export type CreateGiftInput = {
 /**
  * Creates a pending gift record in the database and initializes a Paystack hosted transaction.
  */
-export async function createPaystackGift(opts: CreateGiftInput): Promise<{ authorizationUrl: string; reference: string }> {
+export async function createPaystackGift(
+  opts: CreateGiftInput,
+  siteUrl?: string,
+): Promise<{ authorizationUrl: string; reference: string }> {
   const amount = Math.round(Number(opts.amount));
   if (!Number.isFinite(amount) || amount < 10) {
     throw new Error('Please enter a valid gift amount (minimum KES 10).');
@@ -57,10 +60,7 @@ export async function createPaystackGift(opts: CreateGiftInput): Promise<{ autho
     throw new Error('Please enter a valid email address.');
   }
 
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '');
-  if (!site) {
-    throw new Error('Site URL is not configured.');
-  }
+  const site = (siteUrl || getSiteUrl()).replace(/\/$/, '');
 
   const reference = newGiftReference();
   const db = getAdminClient();
