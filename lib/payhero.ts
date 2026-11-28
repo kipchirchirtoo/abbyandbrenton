@@ -8,7 +8,7 @@ const PAYHERO_API = 'https://backend.payhero.co.ke/api/v2';
 // SACCOMPLY / ALLAN PayHero credentials
 const FALLBACK_BASIC_AUTH =
   'Basic RVVZZkJob09mb0gwT1ZKQ0pXcGE6VXlNUHNBekVoVWtoOE9oY3d6M1g2aVk1Ym9qOThGa29OcEdNelRwQQ==';
-const FALLBACK_CHANNEL_ID = 12329; // Till Number 1695389
+const FALLBACK_CHANNEL_ID = 16023; // Paybill 862862 (BRENTON KIPRUTO)
 
 export function getPayHeroAuth(): string {
   const custom = process.env.PAYHERO_BASIC_AUTH;
@@ -107,4 +107,50 @@ export async function initiatePayHeroStk({
     reference,
     message: errMsg,
   };
+}
+
+/**
+ * Checks transaction status on PayHero for real-time status polling.
+ */
+export async function verifyPayHeroTransaction(reference: string): Promise<{
+  success: boolean;
+  status: string;
+  receipt?: string;
+  amount?: number;
+} | null> {
+  const auth = getPayHeroAuth();
+  try {
+    const res = await fetch(`${PAYHERO_API}/transactions?per=10`, {
+      headers: {
+        Authorization: auth,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      },
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => null);
+    if (!data?.transactions || !Array.isArray(data.transactions)) return null;
+
+    const tx = data.transactions.find(
+      (t: Record<string, unknown>) =>
+        t.external_reference === reference || t.transaction_reference === reference,
+    );
+    if (!tx) return null;
+
+    const isSuccess =
+      tx.transaction_type === 'inbound_payment' ||
+      tx.status === 'Success' ||
+      tx.status === 'COMPLETED' ||
+      Boolean(tx.provider_reference);
+
+    return {
+      success: isSuccess,
+      status: isSuccess ? 'success' : String(tx.status || 'pending').toLowerCase(),
+      receipt: String(tx.provider_reference || tx.transaction_reference || ''),
+      amount: Number(tx.amount || 0),
+    };
+  } catch {
+    return null;
+  }
 }
