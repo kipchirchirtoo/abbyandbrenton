@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { gift } from '@/lib/content';
 
 const QUICK_AMOUNTS = [1000, 2500, 5000, 10000, 25000];
-const FALLBACK_PUBLIC_KEY = 'pk_test_2232f43850b16f5ce643e4ff18180f77281872da';
+const FALLBACK_PUBLIC_KEY = 'pk_live_70581b580ad88eb026790a99af594803716e93d3';
 
 type Props = {
   stkEnabled: boolean;

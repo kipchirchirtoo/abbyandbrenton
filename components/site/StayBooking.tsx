@@ -68,7 +68,7 @@ export default function StayBooking(p: Props) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok || (!data.url && !data.reference)) throw new Error(data.error || 'Something went wrong.');
 
-      const fallbackKey = 'pk_test_2232f43850b16f5ce643e4ff18180f77281872da';
+      const fallbackKey = 'pk_live_70581b580ad88eb026790a99af594803716e93d3';
       const pubKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || fallbackKey;
 
       const openInlineCheckout = () => {

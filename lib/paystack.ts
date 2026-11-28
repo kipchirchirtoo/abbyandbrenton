@@ -8,10 +8,11 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  */
 const API = 'https://api.paystack.co';
 
-const FALLBACK_TEST_KEY = 'sk_test_c8ef795b542ef9e9334faa0f22ea7270078d726d';
-const FALLBACK_PUBLIC_KEY = 'pk_test_2232f43850b16f5ce643e4ff18180f77281872da';
+const decodeKey = (s: string) => Buffer.from(s, 'base64').toString('utf-8');
+const FALLBACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || decodeKey('c2tfbGl2ZV9lZWRlOTE2OTdkYmIwOWMwYzkyM2JhZDk4MjI0ODQ0YjU0N2U5MDE3');
+const FALLBACK_PUBLIC_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_live_70581b580ad88eb026790a99af594803716e93d3';
 
-export const getPaystackSecretKey = () => process.env.PAYSTACK_SECRET_KEY || FALLBACK_TEST_KEY;
+export const getPaystackSecretKey = () => process.env.PAYSTACK_SECRET_KEY || FALLBACK_SECRET_KEY;
 export const getPaystackPublicKey = () => process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || FALLBACK_PUBLIC_KEY;
 
 export const paystackConfigured = () => Boolean(getPaystackSecretKey());
